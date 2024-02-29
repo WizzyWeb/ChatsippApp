@@ -6,8 +6,6 @@ const {
   BRAND_NAME: brandName,
   CHATWOOT_INBOX_TOKEN: chatwootInboxToken,
   CSML_EDITOR_HOST: csmlEditorHost,
-  CSML_BOT_HOST:csmlBothost,
-  CSML_BOT_API_KEY:csmlBotapi,
   CREATE_NEW_ACCOUNT_FROM_DASHBOARD: createNewAccountFromDashboard,
   DIRECT_UPLOADS_ENABLED: directUploadsEnabled,
   DISPLAY_MANIFEST: displayManifest,

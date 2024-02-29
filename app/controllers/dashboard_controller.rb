@@ -31,8 +31,6 @@ class DashboardController < ActionController::Base
       'DISABLE_USER_PROFILE_UPDATE',
       'DEPLOYMENT_ENV',
       'CSML_EDITOR_HOST'
-      'CSML_BOT_HOST'
-      'CSML_BOT_API_KEY'
     ).merge(app_config)
   end
 
