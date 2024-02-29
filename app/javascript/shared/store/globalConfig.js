@@ -30,8 +30,6 @@ const state = {
   brandName,
   chatwootInboxToken,
   csmlEditorHost,
-  csmlBothost,
-  csmlBotapi,
   deploymentEnv,
   createNewAccountFromDashboard,
   directUploadsEnabled: directUploadsEnabled === 'true',
