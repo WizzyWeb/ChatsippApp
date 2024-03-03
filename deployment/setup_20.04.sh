@@ -230,7 +230,7 @@ function install_webserver() {
 #   None
 ##############################################################################
 function create_cw_user() {
-  if ! id -u "chatwoot"; then
+  if ! id -u "Chatshippo"; then
     adduser --disabled-login --gecos "" chatwoot
   fi
 }

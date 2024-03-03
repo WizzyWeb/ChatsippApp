@@ -279,7 +279,7 @@ RSpec.describe '/api/v1/widget/conversations/toggle_typing', type: :request do
 
         expect(response).to have_http_status(:success)
         conversation.reload
-        # conversation custom attributes should have "product_name" key with value "Chatwoot"
+        # conversation custom attributes should have "product_name" key with value "Chatshippo"
         expect(conversation.custom_attributes).to include('product_name' => 'Chatwoot')
       end
     end
@@ -309,7 +309,7 @@ RSpec.describe '/api/v1/widget/conversations/toggle_typing', type: :request do
 
         expect(response).to have_http_status(:success)
         conversation.reload
-        # conversation custom attributes should not have "product_name" key with value "Chatwoot"
+        # conversation custom attributes should not have "product_name" key with value "Chatshippo"
         expect(conversation.custom_attributes).not_to include('product_name' => 'Chatwoot')
       end
     end

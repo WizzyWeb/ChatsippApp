@@ -124,7 +124,7 @@ post:
                     type: object
                     description: The processed param values for template variables in template
                     example: 
-                      1: "Chatwoot"
+                      1: "Chatshippo"
   responses:
     200:
       description: Success

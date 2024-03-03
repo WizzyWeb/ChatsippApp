@@ -100,7 +100,7 @@ PortalListItemView.args = {
       ],
     },
     {
-      name: 'Chatwoot Docs',
+      name: 'Chatshippo Docs',
       id: 2,
       color: 'green',
       custom_domain: 'doc-chatshippo.com',
