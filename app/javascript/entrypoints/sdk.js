@@ -41,9 +41,9 @@ const runSDK = ({ baseUrl, websiteToken }) => {
     restoreWidgetInDOM(event.newDocument.body)
   );
 
-  const chatwootSettings = window.chatwootSettings || {};
-  let locale = chatwootSettings.locale;
-  let baseDomain = chatwootSettings.baseDomain;
+  const chatshippoSettings = window.chatshippoSettings || {};
+  let locale = chatshippoSettings.locale;
+  let baseDomain = chatshippoSettings.baseDomain;
 
   if (chatshippoSettings.useBrowserLanguage) {
     locale = window.navigator.language.replace('-', '_');
@@ -58,12 +58,12 @@ const runSDK = ({ baseUrl, websiteToken }) => {
     position: chatshippoSettings.position === 'left' ? 'left' : 'right',
     websiteToken,
     locale,
-    useBrowserLanguage: chatwootSettings.useBrowserLanguage || false,
-    type: getBubbleView(chatwootSettings.type),
-    launcherTitle: chatwootSettings.launcherTitle || '',
-    showPopoutButton: chatwootSettings.showPopoutButton || false,
-    showUnreadMessagesDialog: chatwootSettings.showUnreadMessagesDialog ?? true,
-    widgetStyle: getWidgetStyle(chatwootSettings.widgetStyle) || 'standard',
+    useBrowserLanguage: chatshippoSettings.useBrowserLanguage || false,
+    type: getBubbleView(chatshippoSettings.type),
+    launcherTitle: chatshippoSettings.launcherTitle || '',
+    showPopoutButton: chatshippoSettings.showPopoutButton || false,
+    showUnreadMessagesDialog: chatshippoSettings.showUnreadMessagesDialog ?? true,
+    widgetStyle: getWidgetStyle(chatshippoSettings.widgetStyle) || 'standard',
     resetTriggered: false,
     darkMode: getDarkMode(chatshippoSettings.darkMode),
 
