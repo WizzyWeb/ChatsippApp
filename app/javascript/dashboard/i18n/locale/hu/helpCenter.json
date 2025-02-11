@@ -606,7 +606,7 @@
             "LABEL": "Slug",
             "PLACEHOLDER": "Kategória az URL-ekhez",
             "ERROR": "Érme megadása kötelező",
-            "HELP_TEXT": "app.chatwoot.com/hc/{portalSlug}/{localeCode}/categories/{categorySlug}"
+            "HELP_TEXT": "app.chatshippo.com/hc/{portalSlug}/{localeCode}/categories/{categorySlug}"
           },
           "DESCRIPTION": {
             "LABEL": "Leírás",
