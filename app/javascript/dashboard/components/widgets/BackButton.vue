@@ -1,34 +1,45 @@
+<script setup>
+import Icon from 'next/icon/Icon.vue';
+import router from '../../routes/index';
+const props = defineProps({
+  backUrl: {
+    type: [String, Object],
+    default: '',
+  },
+  buttonLabel: {
+    type: String,
+    default: '',
+  },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const goBack = () => {
+  if (props.backUrl !== '') {
+    router.push(props.backUrl);
+  } else {
+    router.go(-1);
+  }
+};
+
+const buttonStyleClass = props.compact
+  ? 'text-sm text-n-slate-11'
+  : 'text-base text-n-blue-text';
+</script>
+
 <template>
   <button
-    class="header-section flex items-center text-base font-normal mr-4 ml-2 cursor-pointer text-woot-500 dark:text-woot-500"
+    class="flex items-center p-0 font-normal cursor-pointer gap-1"
+    :class="buttonStyleClass"
     @click.capture="goBack"
   >
-    <fluent-icon icon="chevron-left" />
+    <Icon
+      icon="i-lucide-chevron-left"
+      class="size-5 ltr:-ml-1 rtl:-mr-1"
+      :class="props.compact ? 'text-n-slate-11' : 'text-n-blue-text'"
+    />
     {{ buttonLabel || $t('GENERAL_SETTINGS.BACK') }}
   </button>
 </template>
-<script>
-import router from '../../routes/index';
-
-export default {
-  props: {
-    backUrl: {
-      type: [String, Object],
-      default: '',
-    },
-    buttonLabel: {
-      type: String,
-      default: '',
-    },
-  },
-  methods: {
-    goBack() {
-      if (this.backUrl !== '') {
-        router.push(this.backUrl);
-      } else {
-        router.go(-1);
-      }
-    },
-  },
-};
-</script>

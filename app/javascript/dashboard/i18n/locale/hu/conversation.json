@@ -38,10 +38,17 @@
     "REMOVE_SELECTION": "Kijelölés törlése",
     "DOWNLOAD": "Letöltés",
     "UNKNOWN_FILE_TYPE": "Ismeretlen fájl",
-    "SAVE_CONTACT": "Mentés",
+    "SAVE_CONTACT": "Save Contact",
+    "NO_CONTENT": "No content to display",
+    "SHARED_ATTACHMENT": {
+      "CONTACT": "{sender} has shared a contact",
+      "LOCATION": "{sender} has shared a location",
+      "FILE": "{sender} has shared a file",
+      "MEETING": "{sender} megbeszélést kezdett"
+    },
     "UPLOADING_ATTACHMENTS": "Csatolt fileok feltöltése...",
     "REPLIED_TO_STORY": "Válaszolt a storydra",
-    "UNSUPPORTED_MESSAGE": "Ez az üzenet nem támogatott.",
+    "UNSUPPORTED_MESSAGE": "This message is unsupported. You can view this message on the Facebook / Instagram app.",
     "UNSUPPORTED_MESSAGE_FACEBOOK": "Ez az üzenet nem támogatott. Ezt az üzenetet a Facebook Messenger alkalmazásban tekintheti meg.",
     "UNSUPPORTED_MESSAGE_INSTAGRAM": "Ez az üzenet nem támogatott. Ezt az üzenetet az Instagram alkalmazásban tekintheti meg.",
     "SUCCESS_DELETE_MESSAGE": "Üzenet törölve",
@@ -64,7 +71,14 @@
       "SNOOZED_UNTIL": "Halasztás eddig",
       "SNOOZED_UNTIL_TOMORROW": "Halasztás holnapig",
       "SNOOZED_UNTIL_NEXT_WEEK": "Halasztás jövő hétig",
-      "SNOOZED_UNTIL_NEXT_REPLY": "Halasztás következő válaszig"
+      "SNOOZED_UNTIL_NEXT_REPLY": "Halasztás következő válaszig",
+      "SLA_STATUS": {
+        "FRT": "FRT {status}",
+        "NRT": "NRT {status}",
+        "RT": "RT {status}",
+        "MISSED": "missed",
+        "DUE": "due"
+      }
     },
     "RESOLVE_DROPDOWN": {
       "MARK_PENDING": "Függőben levőként megjelölés",
@@ -94,7 +108,7 @@
         "SELECT_PLACEHOLDER": "Nincs",
         "INPUT_PLACEHOLDER": "Prioritás megadása",
         "NO_RESULTS": "Nincs találat",
-        "SUCCESSFUL": "Beszélgetés prioritásának megváltoztatása",
+        "SUCCESSFUL": "Changed priority of conversation id {conversationId} to {priority}",
         "FAILED": "Nem sikerült megváltoztatni a prioritást. Kérlek, próbáld újra."
       }
     },
@@ -115,15 +129,15 @@
       "ASSIGN_TEAM": "Csapat hozzárendelése",
       "API": {
         "AGENT_ASSIGNMENT": {
-          "SUCCESFUL": "Beszélgetés azonosító",
+          "SUCCESFUL": "Conversation id {conversationId} assigned to \"{agentName}\"",
           "FAILED": "Nem sikerült hozzárendelni ügynököt. Kérlek, próbáld újra."
         },
         "LABEL_ASSIGNMENT": {
-          "SUCCESFUL": "Címke hozzárendelése",
+          "SUCCESFUL": "Assigned label #{labelName} to conversation id {conversationId}",
           "FAILED": "Nem sikerült hozzárendelni címkét. Kérlek, próbáld újra."
         },
         "TEAM_ASSIGNMENT": {
-          "SUCCESFUL": "Hozzárendelés csoporthoz",
+          "SUCCESFUL": "Assigned team \"{team}\" to conversation id {conversationId}",
           "FAILED": "Nem sikerült hozzárendelni csoporthoz. Kérlek, próbáld újra."
         }
       }
@@ -135,7 +149,8 @@
       "MSG_INPUT": "Shift + enter új sorért. Kezdj a '/'-el mentett válasz kiválasztásához.",
       "PRIVATE_MSG_INPUT": "Shift + enter új sorért. Ezt csak ügynökök láthatják",
       "MESSAGE_SIGNATURE_NOT_CONFIGURED": "Üzenet aláírása nem változott, kérlek, változtasd meg a profilod beállításaiban. ",
-      "CLICK_HERE": "Frissítéshez kattints ide"
+      "CLICK_HERE": "Frissítéshez kattints ide",
+      "WHATSAPP_TEMPLATES": "Whatsapp sablonok"
     },
     "REPLYBOX": {
       "REPLY": "Válasz",
@@ -211,6 +226,10 @@
         "DELETE": "Törlés",
         "CANCEL": "Mégse"
       }
+    },
+    "SIDEBAR": {
+      "CONTACT": "Kontakt",
+      "COPILOT": "Copilot"
     }
   },
   "EMAIL_TRANSCRIPT": {
@@ -231,27 +250,31 @@
     }
   },
   "ONBOARDING": {
-    "TITLE": "Hello 👋, köszöntünk a %{installationName}!",
-    "DESCRIPTION": "Köszönjük, hogy feliratkoztál. Segíteni akarunk, hogy a legtöbbet hozd ki a %{installationName}. Itt találsz egy pár dolgot, amit a %{installationName} lehetővé tesz.",
+    "TITLE": "Hello 👋, köszöntünk a {installationName}!",
+    "DESCRIPTION": "Köszönjük, hogy feliratkoztál. Segíteni akarunk, hogy a legtöbbet hozd ki a {installationName}. Itt találsz egy pár dolgot, amit a {installationName} lehetővé tesz.",
+    "GREETING_MORNING": "👋 Good morning, {name}. Welcome to {installationName}.",
+    "GREETING_AFTERNOON": "👋 Good afternoon, {name}. Welcome to {installationName}.",
+    "GREETING_EVENING": "👋 Good evening, {name}. Welcome to {installationName}.",
     "READ_LATEST_UPDATES": "Olvasd el legfrissebbeket",
     "ALL_CONVERSATION": {
       "TITLE": "Minden beszélgetésed egy helyen",
-      "DESCRIPTION": "Kövesd az összes ügyfélbeszélgetésedet egy felületről. Szűrheted a beszélgetéseket csatorna, cimke vagy státusz alapján."
+      "DESCRIPTION": "Kövesd az összes ügyfélbeszélgetésedet egy felületről. Szűrheted a beszélgetéseket csatorna, cimke vagy státusz alapján.",
+      "NEW_LINK": "Kattints ide postaláda létrehozásához"
     },
     "TEAM_MEMBERS": {
       "TITLE": "Hívd meg csapattagjaidat",
       "DESCRIPTION": "Mivel éppen ügyféllel készülsz beszélni, hívd meg a csapattagjaidat, hogy segíthessenek neked. Az e-mailcímük ügynöklistába való megadásával tudod meghívni őket.",
       "NEW_LINK": "Kattints ide csapattag meghívásához"
     },
-    "INBOXES": {
-      "TITLE": "Inboxok összekötése",
-      "DESCRIPTION": "Különböző csatornákat használva kapcsolódj az ügyfeleidhez. Weboldal chateden, a Facebook vagy Twitter fiókodon, vagy akár WhatsApp számodon keresztül.",
-      "NEW_LINK": "Kattints ide postaláda létrehozásához"
-    },
     "LABELS": {
       "TITLE": "Rendezd a beszélgetéseket cimkékkel",
       "DESCRIPTION": "A cimkék egyszerű módot biztosítanak hogy kategorizáld a beszélgetést. Hozz létre cimkéket, mint például a #támogatás vagy a #számlázás, stb... későbbi használatra.",
       "NEW_LINK": "Kattints ide cimkék létrehozásához"
+    },
+    "CANNED_RESPONSES": {
+      "TITLE": "Create canned responses",
+      "DESCRIPTION": "Pre-written quick reply templates help you quickly respond to a conversation. Agents can type the '/' character followed by the shortcode to insert a response.",
+      "NEW_LINK": "Click here to create a canned response"
     }
   },
   "CONVERSATION_SIDEBAR": {
@@ -273,6 +296,7 @@
   },
   "CONVERSATION_CUSTOM_ATTRIBUTES": {
     "ADD_BUTTON_TEXT": "Attribútum hozzáadása",
+    "NO_RECORDS_FOUND": "Nem található tulajdonság",
     "UPDATE": {
       "SUCCESS": "Tulajdonság sikeresen frissítve",
       "ERROR": "Nem lehet frissíteni a tulajdonságot. Kérlek, próbáld újra"
@@ -297,17 +321,18 @@
     "TO": "Ide",
     "BCC": "Titkos másolat",
     "CC": "Másolat",
-    "SUBJECT": "Tárgy"
+    "SUBJECT": "Tárgy",
+    "EXPAND": "Expand email"
   },
   "CONVERSATION_PARTICIPANTS": {
     "SIDEBAR_MENU_TITLE": "Részvétel",
     "SIDEBAR_TITLE": "Résztvevők",
     "NO_RECORDS_FOUND": "Nincs találat",
     "ADD_PARTICIPANTS": "Résztvevők kiválasztása",
-    "REMANING_PARTICIPANTS_TEXT": "+%{count} fő",
-    "REMANING_PARTICIPANT_TEXT": "+%{count} fő",
-    "TOTAL_PARTICIPANTS_TEXT": "+%{count} fő vesz részt.",
-    "TOTAL_PARTICIPANT_TEXT": "+%{count} fő vesz részt.",
+    "REMANING_PARTICIPANTS_TEXT": "+{count} fő",
+    "REMANING_PARTICIPANT_TEXT": "+{count} fő",
+    "TOTAL_PARTICIPANTS_TEXT": "+{count} fő vesz részt.",
+    "TOTAL_PARTICIPANT_TEXT": "+{count} fő vesz részt.",
     "NO_PARTICIPANTS_TEXT": "Nincs részvevő!.",
     "WATCH_CONVERSATION": "Csatlakozás a beszélgetéshez",
     "YOU_ARE_WATCHING": "Te részt veszel",
@@ -322,5 +347,10 @@
     "ORIGINAL_CONTENT": "Eredeti szöveg",
     "TRANSLATED_CONTENT": "Fordított szöveg",
     "NO_TRANSLATIONS_AVAILABLE": "Nem elérhető fordítás ehhez a tartalomhoz"
+  },
+  "TYPING": {
+    "ONE": "{user} is typing",
+    "TWO": "{user} and {secondUser} are typing",
+    "MULTIPLE": "{user} and {count} others are typing"
   }
 }

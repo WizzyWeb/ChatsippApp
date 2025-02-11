@@ -34,7 +34,7 @@ export default {
   DOCS_URL: '//www.chatshippo.com/docs/product/',
   HELP_CENTER_DOCS_URL: '//www.chatshippo.com/docs/product/others/help-center',
   TESTIMONIAL_URL: 'https://testimonials.cdn.chatshippo.com/content.json',
-  SMALL_SCREEN_BREAKPOINT: 1024,
+  SMALL_SCREEN_BREAKPOINT: 1200,
   AVAILABILITY_STATUS_KEYS: ['online', 'busy', 'offline'],
   SNOOZE_OPTIONS: {
     UNTIL_NEXT_REPLY: 'until_next_reply',
@@ -44,7 +44,7 @@ export default {
     UNTIL_NEXT_MONTH: 'until_next_month',
     UNTIL_CUSTOM_TIME: 'until_custom_time',
   },
-  EXAMPLE_URL: 'https://example.com',
+  EXAMPLE_URL: 'example.com',
   EXAMPLE_WEBHOOK_URL: 'https://example/api/webhook',
   INBOX_SORT_BY: {
     NEWEST: 'desc',
@@ -58,6 +58,11 @@ export default {
     STATUS: 'status',
     TYPE: 'type',
     SORT_ORDER: 'sort_order',
+  },
+  SLA_MISS_TYPES: {
+    FRT: 'frt',
+    NRT: 'nrt',
+    RT: 'rt',
   },
 };
 export const DEFAULT_REDIRECT_URL = '/app/';

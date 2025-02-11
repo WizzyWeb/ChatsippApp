@@ -1,6 +1,8 @@
 import AuthAPI from '../api/auth';
 import BaseActionCableConnector from '../../shared/helpers/BaseActionCableConnector';
 import DashboardAudioNotificationHelper from './AudioAlerts/DashboardAudioNotificationHelper';
+import { BUS_EVENTS } from 'shared/constants/busEvents';
+import { emitter } from 'shared/helpers/mitt';
 
 class ActionCableConnector extends BaseActionCableConnector {
   constructor(app, pubsubToken) {
@@ -25,41 +27,20 @@ class ActionCableConnector extends BaseActionCableConnector {
       'notification.created': this.onNotificationCreated,
       'notification.deleted': this.onNotificationDeleted,
       'notification.updated': this.onNotificationUpdated,
-      'first.reply.created': this.onFirstReplyCreated,
       'conversation.read': this.onConversationRead,
       'conversation.updated': this.onConversationUpdated,
       'account.cache_invalidated': this.onCacheInvalidate,
     };
   }
 
+  // eslint-disable-next-line class-methods-use-this
   onReconnect = () => {
-    this.syncActiveConversationMessages();
+    emitter.emit(BUS_EVENTS.WEBSOCKET_RECONNECT);
   };
 
+  // eslint-disable-next-line class-methods-use-this
   onDisconnected = () => {
-    this.setActiveConversationLastMessageId();
-  };
-
-  setActiveConversationLastMessageId = () => {
-    const {
-      params: { conversation_id },
-    } = this.app.$route;
-    if (conversation_id) {
-      this.app.$store.dispatch('setConversationLastMessageId', {
-        conversationId: Number(conversation_id),
-      });
-    }
-  };
-
-  syncActiveConversationMessages = () => {
-    const {
-      params: { conversation_id },
-    } = this.app.$route;
-    if (conversation_id) {
-      this.app.$store.dispatch('syncActiveConversationMessages', {
-        conversationId: Number(conversation_id),
-      });
-    }
+    emitter.emit(BUS_EVENTS.WEBSOCKET_DISCONNECT);
   };
 
   isAValidEvent = data => {
@@ -177,8 +158,7 @@ class ActionCableConnector extends BaseActionCableConnector {
 
   // eslint-disable-next-line class-methods-use-this
   fetchConversationStats = () => {
-    bus.$emit('fetch_conversation_stats');
-    bus.$emit('fetch_overview_reports');
+    emitter.emit('fetch_conversation_stats');
   };
 
   onContactDelete = data => {
@@ -205,11 +185,6 @@ class ActionCableConnector extends BaseActionCableConnector {
     this.app.$store.dispatch('notifications/updateNotification', data);
   };
 
-  // eslint-disable-next-line class-methods-use-this
-  onFirstReplyCreated = () => {
-    bus.$emit('fetch_overview_reports');
-  };
-
   onCacheInvalidate = data => {
     const keys = data.cache_keys;
     this.app.$store.dispatch('labels/revalidate', { newKey: keys.label });
@@ -219,7 +194,7 @@ class ActionCableConnector extends BaseActionCableConnector {
 }
 
 export default {
-  init(pubsubToken) {
-    return new ActionCableConnector(window.WOOT, pubsubToken);
+  init(store, pubsubToken) {
+    return new ActionCableConnector({ $store: store }, pubsubToken);
   },
 };

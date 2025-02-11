@@ -44,6 +44,16 @@ describe('#getters', () => {
     ]);
   });
 
+  it('getNotificationById', () => {
+    const state = {
+      records: {
+        1: { id: 1 },
+      },
+    };
+    expect(getters.getNotificationById(state)(1)).toEqual({ id: 1 });
+    expect(getters.getNotificationById(state)(2)).toEqual({});
+  });
+
   it('getUIFlags', () => {
     const state = {
       uiFlags: {
@@ -70,5 +80,19 @@ describe('#getters', () => {
       meta: { unreadCount: 1 },
     };
     expect(getters.getMeta(state)).toEqual({ unreadCount: 1 });
+  });
+
+  it('getNotificationFilters', () => {
+    const state = {
+      notificationFilters: {
+        page: 1,
+        status: 'unread',
+        type: 'all',
+        sortOrder: 'desc',
+      },
+    };
+    expect(getters.getNotificationFilters(state)).toEqual(
+      state.notificationFilters
+    );
   });
 });

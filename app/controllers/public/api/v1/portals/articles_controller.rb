@@ -6,15 +6,20 @@ class Public::Api::V1::Portals::ArticlesController < Public::Api::V1::Portals::B
   layout 'portal'
 
   def index
-    @articles = @portal.articles
-    @articles = @articles.search(list_params) if list_params.present?
+    @articles = @portal.articles.published
+    @articles_count = @articles.count
+    search_articles
     order_by_sort_param
-    @articles.page(list_params[:page]) if list_params[:page].present?
+    @articles = @articles.page(list_params[:page]) if list_params[:page].present?
   end
 
   def show; end
 
   private
+
+  def search_articles
+    @articles = @articles.search(list_params) if list_params.present?
+  end
 
   def order_by_sort_param
     @articles = if list_params[:sort].present? && list_params[:sort] == 'views'
@@ -26,7 +31,7 @@ class Public::Api::V1::Portals::ArticlesController < Public::Api::V1::Portals::B
 
   def set_article
     @article = @portal.articles.find_by(slug: permitted_params[:article_slug])
-    @article.increment_view_count
+    @article.increment_view_count if @article.published?
     @parsed_content = render_article_content(@article.content)
   end
 
@@ -40,7 +45,7 @@ class Public::Api::V1::Portals::ArticlesController < Public::Api::V1::Portals::B
   end
 
   def list_params
-    params.permit(:query, :locale, :sort, :status)
+    params.permit(:query, :locale, :sort, :status, :page)
   end
 
   def permitted_params
@@ -51,3 +56,5 @@ class Public::Api::V1::Portals::ArticlesController < Public::Api::V1::Portals::B
     ChatwootMarkdownRenderer.new(content).render_article
   end
 end
+
+Public::Api::V1::Portals::ArticlesController.prepend_mod_with('Public::Api::V1::Portals::ArticlesController')

@@ -58,10 +58,12 @@ class Integrations::Slack::SendOnSlackService < Base::SendOnChannelService
   end
 
   def message_text
-    if message.content.present?
-      message.content.gsub(MENTION_REGEX, '\1')
+    content = message.processed_message_content || message.content
+
+    if content.present?
+      content.gsub(MENTION_REGEX, '\1')
     else
-      message.content
+      content
     end
   end
 
@@ -115,6 +117,8 @@ class Integrations::Slack::SendOnSlackService < Base::SendOnChannelService
   end
 
   def upload_file
+    return unless message.attachments.first.with_attached_file?
+
     result = slack_client.files_upload({
       channels: hook.reference_id,
       initial_comment: 'Attached File!',

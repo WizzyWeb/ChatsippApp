@@ -26,14 +26,20 @@ module MailboxHelper
 
     # ensure we don't add more than the permitted number of attachments
     all_attachments = processed_mail.attachments.last(Message::NUMBER_OF_PERMITTED_ATTACHMENTS)
+    grouped_attachments = group_attachments(all_attachments)
 
-    inline_attachments = all_attachments.select { |attachment| attachment[:original].inline? }
-    regular_attachments = all_attachments - inline_attachments
-
-    process_inline_attachments(inline_attachments) if inline_attachments.present?
-    process_regular_attachments(regular_attachments) if regular_attachments.present?
+    process_inline_attachments(grouped_attachments[:inline]) if grouped_attachments[:inline].present?
+    process_regular_attachments(grouped_attachments[:regular]) if grouped_attachments[:regular].present?
 
     @message.save!
+  end
+
+  def group_attachments(attachments)
+    # If the email lacks a text body, treat inline attachments as standard attachments for processing.
+    inline_attachments = attachments.select { |attachment| attachment[:original].inline? && mail_content.present? }
+
+    regular_attachments = attachments - inline_attachments
+    { inline: inline_attachments, regular: regular_attachments }
   end
 
   def process_regular_attachments(attachments)
@@ -80,10 +86,15 @@ module MailboxHelper
 
   def embed_plain_text_email_with_inline_image(mail_attachment)
     attachment_name = mail_attachment[:original].filename
+    img_tag = "<img src=\"#{inline_image_url(mail_attachment[:blob])}\" alt=\"#{attachment_name}\">"
 
-    @text_content = @text_content.gsub(
-      "[image: #{attachment_name}]", "<img src=\"#{inline_image_url(mail_attachment[:blob])}\" alt=\"#{attachment_name}\">"
-    )
+    tag_to_replace = "[image: #{attachment_name}]"
+
+    if @text_content.include?(tag_to_replace)
+      @text_content = @text_content.gsub(tag_to_replace, img_tag)
+    else
+      @text_content += "\n\n#{img_tag}"
+    end
   end
 
   def inline_image_url(blob)
@@ -97,19 +108,12 @@ module MailboxHelper
       contact_attributes: {
         name: identify_contact_name,
         email: processed_mail.original_sender,
-        additional_attributes: {
-          source_id: "email:#{processed_mail.message_id}"
-        }
+        additional_attributes: { source_id: "email:#{processed_mail.message_id}" }
       }
     ).perform
 
     @contact = @contact_inbox.contact
     Rails.logger.info "[MailboxHelper] Contact created with ID: #{@contact.id} for inbox with ID: #{@inbox.id}"
-  end
-
-  def notification_email_from_chatwoot?
-    # notification emails are send via mailer sender email address. so it should match
-    @processed_mail.original_sender == Mail::Address.new(ENV.fetch('MAILER_SENDER_EMAIL', 'Chatshippo <accounts@chatshippo.com>')).address
   end
 
   def mail_content

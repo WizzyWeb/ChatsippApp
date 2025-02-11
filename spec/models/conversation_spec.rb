@@ -156,7 +156,7 @@ RSpec.describe Conversation do
                                                                  changed_attributes: nil, performed_by: nil)
       expect(Rails.configuration.dispatcher).to have_received(:dispatch)
         .with(described_class::ASSIGNEE_CHANGED, kind_of(Time), conversation: conversation, notifiable_assignee_change: true,
-                                                                changed_attributes: nil, performed_by: nil)
+                                                                changed_attributes: changed_attributes, performed_by: nil)
       expect(Rails.configuration.dispatcher).to have_received(:dispatch)
         .with(described_class::CONVERSATION_UPDATED, kind_of(Time), conversation: conversation, notifiable_assignee_change: true,
                                                                     changed_attributes: changed_attributes, performed_by: nil)
@@ -372,9 +372,9 @@ RSpec.describe Conversation do
       expect(conversation.reload.resolved?).to be(true)
     end
 
-    it 'marks conversation as muted in redis' do
+    it 'blocks the contact' do
       mute!
-      expect(Redis::Alfred.get(conversation.send(:mute_key))).not_to be_nil
+      expect(conversation.reload.contact.blocked?).to be(true)
     end
 
     it 'creates mute message' do
@@ -400,10 +400,9 @@ RSpec.describe Conversation do
       expect { unmute! }.not_to(change { conversation.reload.status })
     end
 
-    it 'marks conversation as muted in redis' do
-      expect { unmute! }
-        .to change { Redis::Alfred.get(conversation.send(:mute_key)) }
-        .to nil
+    it 'unblocks the contact' do
+      unmute!
+      expect(conversation.reload.contact.blocked?).to be(false)
     end
 
     it 'creates unmute message' do
@@ -526,6 +525,7 @@ RSpec.describe Conversation do
         id: conversation.display_id,
         messages: [],
         labels: [],
+        last_activity_at: conversation.last_activity_at.to_i,
         inbox_id: conversation.inbox_id,
         status: conversation.status,
         contact_inbox: conversation.contact_inbox,
@@ -546,6 +546,17 @@ RSpec.describe Conversation do
 
     it 'returns push event payload' do
       expect(push_event_data).to eq(expected_data)
+    end
+  end
+
+  describe 'when conversation is created by blocked contact' do
+    let(:account) { create(:account) }
+    let(:blocked_contact) { create(:contact, account: account, blocked: true) }
+    let(:inbox) { create(:inbox, account: account) }
+
+    it 'creates conversation in resolved state' do
+      conversation = create(:conversation, account: account, contact: blocked_contact, inbox: inbox)
+      expect(conversation.status).to eq('resolved')
     end
   end
 
@@ -869,6 +880,41 @@ RSpec.describe Conversation do
       conversation.update(label_list: %w[customer-support enterprise paid-customer])
 
       expect(conversation.cached_label_list_array).to eq %w[customer-support enterprise paid-customer]
+    end
+  end
+
+  describe '#last_activity_at' do
+    let(:conversation) { create(:conversation) }
+    let(:message_params) do
+      {
+        conversation: conversation,
+        account: conversation.account,
+        inbox: conversation.inbox,
+        sender: conversation.assignee
+      }
+    end
+
+    context 'when a new conversation is created' do
+      it 'sets last_activity_at to the created_at time' do
+        expect(conversation.last_activity_at).to eq(conversation.created_at)
+      end
+    end
+
+    context 'when a new message is added' do
+      it 'updates the last_activity_at to the new message\'s created_at time' do
+        message = create(:message, created_at: 1.hour.from_now, **message_params)
+        conversation.reload
+        expect(conversation.last_activity_at).to be_within(1.second).of(message.created_at)
+      end
+    end
+
+    context 'when multiple messages are added' do
+      it 'sets last_activity_at to the most recent message\'s created_at time' do
+        create(:message, created_at: 2.hours.ago, **message_params)
+        latest_message = create(:message, created_at: 1.hour.from_now, **message_params)
+        conversation.reload
+        expect(conversation.last_activity_at).to be_within(1.second).of(latest_message.created_at)
+      end
     end
   end
 end

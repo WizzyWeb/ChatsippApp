@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
-  # These are extensions that must be enabled in order to support this database
+ActiveRecord::Schema[7.0].define(version: 2025_01_16_061033) do
+  # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
+  enable_extension "vector"
 
   create_table "access_tokens", force: :cascade do |t|
     t.string "owner_type"
@@ -37,8 +38,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.datetime "active_at", precision: nil
     t.integer "availability", default: 0, null: false
     t.boolean "auto_offline", default: true, null: false
+    t.bigint "custom_role_id"
     t.index ["account_id", "user_id"], name: "uniq_user_id_per_account_id", unique: true
     t.index ["account_id"], name: "index_account_users_on_account_id"
+    t.index ["custom_role_id"], name: "index_account_users_on_custom_role_id"
     t.index ["user_id"], name: "index_account_users_on_user_id"
   end
 
@@ -122,9 +125,19 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "sla_status", default: 0
+    t.index ["account_id", "sla_policy_id", "conversation_id"], name: "index_applied_slas_on_account_sla_policy_conversation", unique: true
     t.index ["account_id"], name: "index_applied_slas_on_account_id"
     t.index ["conversation_id"], name: "index_applied_slas_on_conversation_id"
     t.index ["sla_policy_id"], name: "index_applied_slas_on_sla_policy_id"
+  end
+
+  create_table "article_embeddings", force: :cascade do |t|
+    t.bigint "article_id", null: false
+    t.text "term", null: false
+    t.vector "embedding", limit: 1536
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["embedding"], name: "index_article_embeddings_on_embedding", using: :ivfflat
   end
 
   create_table "articles", force: :cascade do |t|
@@ -144,6 +157,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.jsonb "meta", default: {}
     t.string "slug", null: false
     t.integer "position"
+    t.string "locale", default: "en", null: false
     t.index ["associated_article_id"], name: "index_articles_on_associated_article_id"
     t.index ["author_id"], name: "index_articles_on_author_id"
     t.index ["slug"], name: "index_articles_on_slug", unique: true
@@ -229,6 +243,59 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.text "content"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+  end
+
+  create_table "captain_assistant_responses", force: :cascade do |t|
+    t.string "question", null: false
+    t.text "answer", null: false
+    t.vector "embedding", limit: 1536
+    t.bigint "assistant_id", null: false
+    t.bigint "documentable_id"
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status", default: 1, null: false
+    t.string "documentable_type"
+    t.index ["account_id"], name: "index_captain_assistant_responses_on_account_id"
+    t.index ["assistant_id"], name: "index_captain_assistant_responses_on_assistant_id"
+    t.index ["documentable_id", "documentable_type"], name: "idx_cap_asst_resp_on_documentable"
+    t.index ["embedding"], name: "vector_idx_knowledge_entries_embedding", using: :ivfflat
+    t.index ["status"], name: "index_captain_assistant_responses_on_status"
+  end
+
+  create_table "captain_assistants", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "account_id", null: false
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "config", default: {}, null: false
+    t.index ["account_id"], name: "index_captain_assistants_on_account_id"
+  end
+
+  create_table "captain_documents", force: :cascade do |t|
+    t.string "name"
+    t.string "external_link", null: false
+    t.text "content"
+    t.bigint "assistant_id", null: false
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
+    t.index ["account_id"], name: "index_captain_documents_on_account_id"
+    t.index ["assistant_id", "external_link"], name: "index_captain_documents_on_assistant_id_and_external_link", unique: true
+    t.index ["assistant_id"], name: "index_captain_documents_on_assistant_id"
+    t.index ["status"], name: "index_captain_documents_on_status"
+  end
+
+  create_table "captain_inboxes", force: :cascade do |t|
+    t.bigint "captain_assistant_id", null: false
+    t.bigint "inbox_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["captain_assistant_id", "inbox_id"], name: "index_captain_inboxes_on_captain_assistant_id_and_inbox_id", unique: true
+    t.index ["captain_assistant_id"], name: "index_captain_inboxes_on_captain_assistant_id"
+    t.index ["inbox_id"], name: "index_captain_inboxes_on_inbox_id"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -422,10 +489,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.string "last_name", default: ""
     t.string "location", default: ""
     t.string "country_code", default: ""
+    t.boolean "blocked", default: false, null: false
     t.index "lower((email)::text), account_id", name: "index_contacts_on_lower_email_account_id"
     t.index ["account_id", "email", "phone_number", "identifier"], name: "index_contacts_on_nonempty_fields", where: "(((email)::text <> ''::text) OR ((phone_number)::text <> ''::text) OR ((identifier)::text <> ''::text))"
+    t.index ["account_id", "last_activity_at"], name: "index_contacts_on_account_id_and_last_activity_at", order: { last_activity_at: "DESC NULLS LAST" }
     t.index ["account_id"], name: "index_contacts_on_account_id"
     t.index ["account_id"], name: "index_resolved_contact_account_id", where: "(((email)::text <> ''::text) OR ((phone_number)::text <> ''::text) OR ((identifier)::text <> ''::text))"
+    t.index ["blocked"], name: "index_contacts_on_blocked"
     t.index ["email", "account_id"], name: "uniq_email_per_account_contact", unique: true
     t.index ["identifier", "account_id"], name: "uniq_identifier_per_account_contact", unique: true
     t.index ["name", "email", "phone_number", "identifier"], name: "index_contacts_on_name_email_phone_number_identifier", opclass: :gin_trgm_ops, using: :gin
@@ -469,7 +539,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.integer "priority"
     t.bigint "sla_policy_id"
     t.datetime "waiting_since"
-    t.string "cached_label_list"
+    t.text "cached_label_list"
     t.index ["account_id", "display_id"], name: "index_conversations_on_account_id_and_display_id", unique: true
     t.index ["account_id", "id"], name: "index_conversations_on_id_and_account_id"
     t.index ["account_id", "inbox_id", "status", "assignee_id"], name: "conv_acid_inbid_stat_asgnid_idx"
@@ -480,7 +550,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.index ["contact_inbox_id"], name: "index_conversations_on_contact_inbox_id"
     t.index ["first_reply_created_at"], name: "index_conversations_on_first_reply_created_at"
     t.index ["inbox_id"], name: "index_conversations_on_inbox_id"
-    t.index ["last_activity_at"], name: "index_conversations_on_last_activity_at"
     t.index ["priority"], name: "index_conversations_on_priority"
     t.index ["status", "account_id"], name: "index_conversations_on_status_and_account_id"
     t.index ["status", "priority"], name: "index_conversations_on_status_and_priority"
@@ -533,6 +602,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_custom_filters_on_account_id"
     t.index ["user_id"], name: "index_custom_filters_on_user_id"
+  end
+
+  create_table "custom_roles", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.bigint "account_id", null: false
+    t.text "permissions", default: [], array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_custom_roles_on_account_id"
   end
 
   create_table "dashboard_apps", force: :cascade do |t|
@@ -693,6 +772,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.text "processed_message_content"
     t.jsonb "sentiment", default: {}
     t.index "((additional_attributes -> 'campaign_id'::text))", name: "index_messages_on_additional_attributes_campaign_id", using: :gin
+    t.index ["account_id", "created_at", "message_type"], name: "index_messages_on_account_created_type"
     t.index ["account_id", "inbox_id"], name: "index_messages_on_account_id_and_inbox_id"
     t.index ["account_id"], name: "index_messages_on_account_id"
     t.index ["content"], name: "index_messages_on_content", opclass: :gin_trgm_ops, using: :gin
@@ -732,7 +812,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.jsonb "subscription_attributes", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "identifier"
+    t.text "identifier"
     t.index ["identifier"], name: "index_notification_subscriptions_on_identifier", unique: true
     t.index ["user_id"], name: "index_notification_subscriptions_on_user_id"
   end
@@ -797,6 +877,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.datetime "updated_at", null: false
     t.jsonb "config", default: {"allowed_locales"=>["en"]}
     t.boolean "archived", default: false
+    t.bigint "channel_web_widget_id"
+    t.index ["channel_web_widget_id"], name: "index_portals_on_channel_web_widget_id"
     t.index ["custom_domain"], name: "index_portals_on_custom_domain", unique: true
     t.index ["slug"], name: "index_portals_on_slug", unique: true
   end
@@ -837,6 +919,23 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_15_065844) do
     t.index ["inbox_id"], name: "index_reporting_events_on_inbox_id"
     t.index ["name"], name: "index_reporting_events_on_name"
     t.index ["user_id"], name: "index_reporting_events_on_user_id"
+  end
+
+  create_table "sla_events", force: :cascade do |t|
+    t.bigint "applied_sla_id", null: false
+    t.bigint "conversation_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "sla_policy_id", null: false
+    t.bigint "inbox_id", null: false
+    t.integer "event_type"
+    t.jsonb "meta", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_sla_events_on_account_id"
+    t.index ["applied_sla_id"], name: "index_sla_events_on_applied_sla_id"
+    t.index ["conversation_id"], name: "index_sla_events_on_conversation_id"
+    t.index ["inbox_id"], name: "index_sla_events_on_inbox_id"
+    t.index ["sla_policy_id"], name: "index_sla_events_on_sla_policy_id"
   end
 
   create_table "sla_policies", force: :cascade do |t|
