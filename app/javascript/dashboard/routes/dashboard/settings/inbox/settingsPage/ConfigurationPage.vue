@@ -111,7 +111,7 @@ export default {
         <woot-code
           :script="inbox.web_widget_script"
           lang="html"
-          :codepen-title="`${inbox.name} - Chatwoot Widget Test`"
+          :codepen-title="`${inbox.name} - Chatshippo Widget Test`"
           enable-code-pen
         />
       </SettingsSection>

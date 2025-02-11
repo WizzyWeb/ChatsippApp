@@ -689,7 +689,7 @@
       "CONFIRM_BUTTON_LABEL": "Criar",
       "NAME": {
         "LABEL": "Nome",
-        "PLACEHOLDER": "User Guide | Chatwoot",
+        "PLACEHOLDER": "User Guide | Chatshippo",
         "MESSAGE": "Choose an name for your portal.",
         "ERROR": "O nome é obrigatório"
       },
@@ -760,7 +760,7 @@
           },
           "DNS_CONFIGURATION_DIALOG": {
             "HEADER": "Configuração de DNS",
-            "DESCRIPTION": "Faça o login na conta que você tem com seu provedor DNS e adicione um registro CNAME para subdomínio apontando para chatwoot.help",
+            "DESCRIPTION": "Faça o login na conta que você tem com seu provedor DNS e adicione um registro CNAME para subdomínio apontando para Chatshippo.help",
             "HELP_TEXT": "Once this is done, you can reach out to our support to request for the auto-generated SSL certificate.",
             "CONFIRM_BUTTON_LABEL": "Got it!"
           }
