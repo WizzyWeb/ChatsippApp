@@ -419,7 +419,7 @@
         "SLUG": {
           "LABEL": "Slug",
           "PLACEHOLDER": "Category slug for urls",
-          "HELP_TEXT": "app.chatwoot.com/hc/minu-portaal/et-EE/kategooriad/minu-slug",
+          "HELP_TEXT": "app.chatshippo.com/hc/minu-portaal/et-EE/kategooriad/minu-slug",
           "ERROR": "Lühinimi on kohustuslik"
         },
         "DESCRIPTION": {
@@ -450,7 +450,7 @@
         "SLUG": {
           "LABEL": "Slug",
           "PLACEHOLDER": "Category slug for urls",
-          "HELP_TEXT": "app.chatwoot.com/hc/minu-portaal/et-EE/kategooriad/minu-slug",
+          "HELP_TEXT": "app.chatshippo.com/hc/minu-portaal/et-EE/kategooriad/minu-slug",
           "ERROR": "Lühinimi on kohustuslik"
         },
         "DESCRIPTION": {
@@ -634,7 +634,7 @@
             "LABEL": "Lühilink",
             "PLACEHOLDER": "Category slug for urls",
             "ERROR": "Lühinimi on kohustuslik",
-            "HELP_TEXT": "app.chatwoot.com/hc/{portalSlug}/{localeCode}/categories/{categorySlug}"
+            "HELP_TEXT": "app.chatshippo.com/hc/{portalSlug}/{localeCode}/categories/{categorySlug}"
           },
           "DESCRIPTION": {
             "LABEL": "Kirjeldus",
@@ -727,7 +727,7 @@
       "CONFIRM_BUTTON_LABEL": "Loo",
       "NAME": {
         "LABEL": "Nimi",
-        "PLACEHOLDER": "User Guide | Chatwoot",
+        "PLACEHOLDER": "User Guide | Chatshippo",
         "MESSAGE": "Vali oma portaalile nimi.",
         "ERROR": "Nimi on kohustuslik"
       },

@@ -419,7 +419,7 @@
         "SLUG": {
           "LABEL": "স্লাগ",
           "PLACEHOLDER": "বিভাগের ইউআরএল স্লাগ",
-          "HELP_TEXT": "app.chatwoot.com/hc/my-portal/en-US/categories/my-slug",
+          "HELP_TEXT": "app.chatshippo.com/hc/my-portal/en-US/categories/my-slug",
           "ERROR": "স্লাগ আবশ্যক"
         },
         "DESCRIPTION": {
@@ -450,7 +450,7 @@
         "SLUG": {
           "LABEL": "স্লাগ",
           "PLACEHOLDER": "বিভাগের ইউআরএল স্লাগ",
-          "HELP_TEXT": "app.chatwoot.com/hc/my-portal/en-US/categories/my-slug",
+          "HELP_TEXT": "app.chatshippo.com/hc/my-portal/en-US/categories/my-slug",
           "ERROR": "স্লাগ আবশ্যক"
         },
         "DESCRIPTION": {
@@ -634,7 +634,7 @@
             "LABEL": "স্লাগ",
             "PLACEHOLDER": "বিভাগের ইউআরএল স্লাগ",
             "ERROR": "স্লাগ আবশ্যক",
-            "HELP_TEXT": "app.chatwoot.com/hc/{portalSlug}/{localeCode}/categories/{categorySlug}"
+            "HELP_TEXT": "app.chatshippo.com/hc/{portalSlug}/{localeCode}/categories/{categorySlug}"
           },
           "DESCRIPTION": {
             "LABEL": "বর্ণনা",
@@ -727,7 +727,7 @@
       "CONFIRM_BUTTON_LABEL": "তৈরি করুন",
       "NAME": {
         "LABEL": "নাম",
-        "PLACEHOLDER": "ব্যবহারকারী গাইড | Chatwoot",
+        "PLACEHOLDER": "ব্যবহারকারী গাইড | Chatshippo",
         "MESSAGE": "আপনার পোর্টালের জন্য একটি নাম নির্বাচন করুন.",
         "ERROR": "নাম আবশ্যক"
       },

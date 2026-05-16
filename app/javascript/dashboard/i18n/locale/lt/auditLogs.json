@@ -10,7 +10,7 @@
     "LIST": {
       "404": "Šiai paskyrai nėra prieinamų Audito Žurnalų.",
       "TITLE": "Tvarkyti Audito Žurnalus",
-      "DESC": "Audito žurnalai yra įvykių ir veiksmų „Chatwoot“ sistemoje pėdsakai.",
+      "DESC": "Audito žurnalai yra įvykių ir veiksmų „Chatshippo“ sistemoje pėdsakai.",
       "TABLE_HEADER": {
         "ACTIVITY": "Vartotojas",
         "TIME": "Action",
