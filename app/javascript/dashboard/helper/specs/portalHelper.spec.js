@@ -26,7 +26,9 @@ describe('PortalHelper', () => {
       };
       expect(
         buildPortalArticleURL('handbook', 'culture', 'fr', 'article-slug')
-      ).toEqual('https://help.chatshippo.com/hc/handbook/articles/article-slug');
+      ).toEqual(
+        'https://help.chatshippo.com/hc/handbook/articles/article-slug'
+      );
       window.chatwootConfig = {};
     });
 

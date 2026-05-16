@@ -8,7 +8,6 @@ import Icon from 'next/icon/Icon.vue';
 import NextButton from 'next/button/Button.vue';
 import LoadingState from 'dashboard/components/widgets/LoadingState.vue';
 import { parseAPIErrorResponse } from 'dashboard/store/utils/api';
-import globalConstants from 'dashboard/constants/globals.js';
 import {
   setupFacebookSdk,
   initWhatsAppEmbeddedSignup,
@@ -256,29 +255,6 @@ onBeforeUnmount(() => {
           <Icon icon="i-lucide-check" class="text-n-slate-11 size-4" />
           {{ benefit.text }}
         </div>
-      </div>
-
-      <div class="flex flex-col gap-2 mb-6">
-        <I18nT
-          keypath="INBOX_MGMT.ADD.WHATSAPP.EMBEDDED_SIGNUP.LEARN_MORE.TEXT"
-          tag="span"
-          class="text-sm text-n-slate-11"
-        >
-          <template #link>
-            <a
-              :href="globalConstants.WHATSAPP_EMBEDDED_SIGNUP_DOCS_URL"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="underline text-n-brand"
-            >
-              {{
-                $t(
-                  'INBOX_MGMT.ADD.WHATSAPP.EMBEDDED_SIGNUP.LEARN_MORE.LINK_TEXT'
-                )
-              }}
-            </a>
-          </template>
-        </I18nT>
       </div>
 
       <div class="flex mt-4">

@@ -1,6 +1,5 @@
 <script>
 import { mapGetters } from 'vuex';
-import wootConstants from 'dashboard/constants/globals';
 import NextButton from 'dashboard/components-next/button/Button.vue';
 
 export default {
@@ -9,7 +8,6 @@ export default {
   },
   data() {
     return {
-      helpCenterDocsURL: wootConstants.HELP_CENTER_DOCS_URL,
       upgradeFeature: [
         {
           key: 1,
@@ -59,9 +57,6 @@ export default {
         params: { accountId: this.accountId },
       });
     },
-    openHelpCenterDocs() {
-      window.open(this.helpCenterDocsURL, '_blank');
-    },
   },
 };
 </script>
@@ -91,11 +86,6 @@ export default {
         v-if="isOnChatwootCloud"
         class="flex flex-row gap-3 justify-start items-center sm:justify-center"
       >
-        <NextButton
-          outline
-          :label="$t('HELP_CENTER.UPGRADE_PAGE.BUTTON.LEARN_MORE')"
-          @click="openHelpCenterDocs"
-        />
         <NextButton
           :label="$t('HELP_CENTER.UPGRADE_PAGE.BUTTON.UPGRADE')"
           @click="openBillingPage"

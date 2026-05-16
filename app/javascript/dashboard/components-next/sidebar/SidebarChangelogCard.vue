@@ -82,16 +82,8 @@ const handleDismiss = slug => {
   }, 200);
 };
 
-const handleReadMore = () => {
-  const currentPost = unDismissedPosts.value[currentIndex.value];
-  if (currentPost?.slug) {
-    window.open(`https://www.chatwoot.com/blog/${currentPost.slug}`, '_blank');
-  }
-};
-
 const handleImgClick = ({ index }) => {
   currentIndex.value = index;
-  handleReadMore();
 };
 
 defineExpose({
@@ -112,7 +104,6 @@ onMounted(() => {
     :current-index="currentIndex"
     :dismissing-slugs="dismissingCards"
     class="min-h-[240px] z-10"
-    @read-more="handleReadMore"
     @dismiss="handleDismiss"
     @img-click="handleImgClick"
   />

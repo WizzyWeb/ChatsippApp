@@ -16,11 +16,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['readMore', 'dismiss', 'imgClick']);
-
-const handleReadMore = () => {
-  emit('readMore');
-};
+const emit = defineEmits(['dismiss', 'imgClick']);
 
 const handleDismiss = () => {
   emit('dismiss');
@@ -80,15 +76,7 @@ const handleImgClick = () => {
       />
     </div>
 
-    <div class="flex justify-between items-center mt-1">
-      <Button
-        label="Read more"
-        color="slate"
-        link
-        sm
-        class="text-xs font-normal hover:!no-underline"
-        @click.stop="handleReadMore"
-      />
+    <div class="flex justify-end items-center mt-1">
       <Button
         label="Dismiss"
         color="slate"

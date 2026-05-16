@@ -4,12 +4,9 @@ import { ref, computed, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { handleOtpPaste } from 'shared/helpers/clipboard';
 import { parseAPIErrorResponse } from 'dashboard/store/utils/api';
-import { useAccount } from 'dashboard/composables/useAccount';
-
 import Icon from 'dashboard/components-next/icon/Icon.vue';
 import FormInput from 'v3/components/Form/Input.vue';
 import NextButton from 'dashboard/components-next/button/Button.vue';
-import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
 
 const props = defineProps({
   mfaToken: {
@@ -21,7 +18,6 @@ const props = defineProps({
 const emit = defineEmits(['verified', 'cancel']);
 
 const { t } = useI18n();
-const { isOnChatwootCloud } = useAccount();
 
 const OTP = 'otp';
 const BACKUP = 'backup';
@@ -32,7 +28,6 @@ const otpDigits = ref(['', '', '', '', '', '']);
 const backupCode = ref('');
 const isVerifying = ref(false);
 const errorMessage = ref('');
-const helpModalRef = ref(null);
 const otpInputRefs = ref([]);
 
 // Computed
@@ -41,10 +36,6 @@ const canSubmit = computed(() =>
   verificationMethod.value === OTP
     ? otpCode.value.length === 6
     : backupCode.value.length === 8
-);
-
-const contactDescKey = computed(() =>
-  isOnChatwootCloud.value ? 'CONTACT_DESC_CLOUD' : 'CONTACT_DESC_SELF_HOSTED'
 );
 
 const focusInput = i => otpInputRefs.value[i]?.focus();
@@ -285,44 +276,10 @@ const handleTryAnotherMethod = () => {
       </form>
     </div>
 
-    <!-- Help Text -->
     <div class="mt-6 text-center">
       <p class="text-sm text-n-slate-11">
         {{ $t('MFA_VERIFICATION.HELP_TEXT') }}
       </p>
-      <NextButton
-        sm
-        link
-        type="button"
-        class="w-full hover:!no-underline"
-        :tabindex="4"
-        :label="$t('MFA_VERIFICATION.LEARN_MORE')"
-        @click="helpModalRef?.open()"
-      />
     </div>
-
-    <!-- Help Modal -->
-    <Dialog
-      ref="helpModalRef"
-      :title="$t('MFA_VERIFICATION.HELP_MODAL.TITLE')"
-      :show-confirm-button="false"
-      class="[&>dialog>div]:bg-n-alpha-3 [&>dialog>div]:rounded-lg"
-      @confirm="helpModalRef?.close()"
-    >
-      <div class="space-y-4 text-sm text-n-slate-11">
-        <div v-for="section in ['AUTHENTICATOR', 'BACKUP']" :key="section">
-          <h4 class="font-medium text-n-slate-12 mb-2">
-            {{ $t(`MFA_VERIFICATION.HELP_MODAL.${section}_TITLE`) }}
-          </h4>
-          <p>{{ $t(`MFA_VERIFICATION.HELP_MODAL.${section}_DESC`) }}</p>
-        </div>
-        <div>
-          <h4 class="font-medium text-n-slate-12 mb-2">
-            {{ $t('MFA_VERIFICATION.HELP_MODAL.CONTACT_TITLE') }}
-          </h4>
-          <p>{{ $t(`MFA_VERIFICATION.HELP_MODAL.${contactDescKey}`) }}</p>
-        </div>
-      </div>
-    </Dialog>
   </div>
 </template>

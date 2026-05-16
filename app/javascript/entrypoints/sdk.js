@@ -68,7 +68,8 @@ const runSDK = ({ baseUrl, websiteToken }) => {
     type: getBubbleView(chatshippoSettings.type),
     launcherTitle: chatshippoSettings.launcherTitle || '',
     showPopoutButton: chatshippoSettings.showPopoutButton || false,
-    showUnreadMessagesDialog: chatshippoSettings.showUnreadMessagesDialog ?? true,
+    showUnreadMessagesDialog:
+      chatshippoSettings.showUnreadMessagesDialog ?? true,
     widgetStyle: getWidgetStyle(chatshippoSettings.widgetStyle) || 'standard',
     resetTriggered: false,
     darkMode: getDarkMode(chatshippoSettings.darkMode),
