@@ -6,7 +6,10 @@
 class EnableCaptainTasksForExistingAccounts < ActiveRecord::Migration[7.0]
   def up
     Account.find_in_batches(batch_size: 100) do |accounts|
-      accounts.each { |account| account.enable_features!('captain_tasks') }
+      accounts.each do |account|
+        account.enable_features('captain_tasks')
+        account.update_column(:feature_flags, account.feature_flags)
+      end
     end
   end
 end

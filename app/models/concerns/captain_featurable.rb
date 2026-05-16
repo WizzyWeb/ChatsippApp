@@ -49,14 +49,25 @@ module CaptainFeaturable
   end
 
   def validate_captain_models
-    return if captain_models.blank?
+    stored_models = stored_captain_models_from_settings
+    return if stored_models.blank?
 
-    captain_models.each do |feature_key, model_name|
+    stored_models.each do |feature_key, model_name|
       next if model_name.blank?
       next if Llm::Models.valid_model_for?(feature_key, model_name)
 
       allowed_models = Llm::Models.models_for(feature_key)
       errors.add(:captain_models, "'#{model_name}' is not a valid model for #{feature_key}. Allowed: #{allowed_models.join(', ')}")
     end
+  end
+
+  # Read directly from settings JSON to avoid store_accessor issues during migrations.
+  def stored_captain_models_from_settings
+    return nil unless has_attribute?(:settings)
+
+    settings_hash = settings
+    return nil unless settings_hash.is_a?(Hash)
+
+    settings_hash['captain_models'] || settings_hash[:captain_models]
   end
 end

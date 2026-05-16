@@ -41,8 +41,9 @@ class Account < ApplicationRecord
   validates :domain, length: { maximum: 100 }
   validates_with JsonSchemaValidator,
                  schema: SETTINGS_PARAMS_SCHEMA,
-                 attribute_resolver: ->(record) { record.settings }
-  validate :validate_reporting_timezone
+                 attribute_resolver: ->(record) { record.settings },
+                 if: ->(record) { record.has_attribute?(:settings) }
+  validate :validate_reporting_timezone, if: -> { has_attribute?(:settings) }
   validate :validate_support_email_format, if: :will_save_change_to_support_email?
 
   store_accessor :settings, :auto_resolve_after, :auto_resolve_message, :auto_resolve_ignore_waiting
