@@ -1,11 +1,10 @@
 <script>
 import V4Button from 'dashboard/components-next/button/Button.vue';
 import { useAlert, useTrack } from 'dashboard/composables';
-import fromUnixTime from 'date-fns/fromUnixTime';
-import format from 'date-fns/format';
-import ReportFilterSelector from './components/FilterSelector.vue';
+import ReportFilters from './components/ReportFilters.vue';
 import { GROUP_BY_FILTER } from './constants';
 import { REPORTS_EVENTS } from '../../../../helper/AnalyticsHelper/events';
+import { generateFileName } from 'dashboard/helper/downloadHelper';
 import ReportContainer from './ReportContainer.vue';
 import ReportHeader from './components/ReportHeader.vue';
 
@@ -23,7 +22,7 @@ export default {
   name: 'ConversationReports',
   components: {
     ReportHeader,
-    ReportFilterSelector,
+    ReportFilters,
     ReportContainer,
     V4Button,
   },
@@ -77,13 +76,19 @@ export default {
         businessHours,
       };
     },
-    downloadAgentReports() {
+    downloadConversationReports() {
       const { from, to } = this;
-      const fileName = `agent-report-${format(
-        fromUnixTime(to),
-        'dd-MM-yyyy'
-      )}.csv`;
-      this.$store.dispatch('downloadAgentReports', { from, to, fileName });
+      const fileName = generateFileName({
+        type: 'conversation',
+        to,
+        businessHours: this.businessHours,
+      });
+      this.$store.dispatch('downloadConversationsSummaryReports', {
+        from,
+        to,
+        fileName,
+        businessHours: this.businessHours,
+      });
     },
     onFilterChange({ from, to, groupBy, businessHours }) {
       this.from = from;
@@ -104,16 +109,16 @@ export default {
 <template>
   <ReportHeader :header-title="$t('REPORT.HEADER')">
     <V4Button
-      :label="$t('REPORT.DOWNLOAD_AGENT_REPORTS')"
+      :label="$t('REPORT.DOWNLOAD_CONVERSATION_REPORTS')"
       icon="i-ph-download-simple"
       size="sm"
-      @click="downloadAgentReports"
+      @click="downloadConversationReports"
     />
   </ReportHeader>
-  <div class="flex flex-col gap-3">
-    <ReportFilterSelector
-      :show-agents-filter="false"
-      show-group-by-filter
+  <div class="flex flex-col">
+    <ReportFilters
+      :show-entity-filter="false"
+      show-group-by
       @filter-change="onFilterChange"
     />
     <ReportContainer :group-by="groupBy" />

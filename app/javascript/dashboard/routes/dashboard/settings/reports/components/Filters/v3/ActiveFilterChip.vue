@@ -8,8 +8,8 @@ const props = defineProps({
     required: true,
   },
   id: {
-    type: Number,
-    required: true,
+    type: [Number, null],
+    default: null,
   },
   type: {
     type: String,
@@ -35,6 +35,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showClearFilter: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits([
@@ -51,7 +55,8 @@ const closeDropdown = () => emit('closeDropdown');
 
 <template>
   <FilterButton
-    right-icon="chevron-down"
+    trailing-icon
+    icon="i-lucide-chevron-down"
     :button-text="name"
     @click="toggleDropdown"
   >
@@ -59,7 +64,7 @@ const closeDropdown = () => emit('closeDropdown');
       <FilterListDropdown
         v-if="options"
         v-on-clickaway="closeDropdown"
-        show-clear-filter
+        :show-clear-filter="showClearFilter"
         :list-items="options"
         :active-filter-id="id"
         :input-placeholder="placeholder"

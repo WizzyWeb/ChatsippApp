@@ -16,6 +16,13 @@ describe('#MessageFormatter', () => {
         '<p>Chatshippo is an opensource tool. <a href="https://www.chatshippo.com" class="link" rel="noreferrer noopener nofollow" target="_blank">https://www.chatshippo.com</a></p>'
       );
     });
+    it('should not convert template variables to links when linkify is disabled', () => {
+      const message = 'Hey {{customer.name}}, check https://chatwoot.com';
+      const formatter = new MessageFormatter(message, false, false, false);
+      expect(formatter.formattedMessage).toMatch(
+        '<p>Hey {{customer.name}}, check https://chatwoot.com</p>'
+      );
+    });
   });
 
   describe('parses heading to strong', () => {

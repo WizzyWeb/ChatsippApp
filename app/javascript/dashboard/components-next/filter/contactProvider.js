@@ -2,7 +2,10 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useOperators } from './operators';
 import { useMapGetter } from 'dashboard/composables/store.js';
-import { buildAttributesFilterTypes } from './helper/filterHelper.js';
+import {
+  buildAttributesFilterTypes,
+  CONTACT_ATTRIBUTES,
+} from './helper/filterHelper.js';
 import countries from 'shared/constants/countries.js';
 
 /**
@@ -47,6 +50,7 @@ export function useContactFilterContext() {
   const { t } = useI18n();
 
   const contactAttributes = useMapGetter('attributes/getContactAttributes');
+  const labels = useMapGetter('labels/getLabels');
 
   const {
     equalityOperators,
@@ -59,7 +63,11 @@ export function useContactFilterContext() {
    * @type {import('vue').ComputedRef<FilterType[]>}
    */
   const customFilterTypes = computed(() =>
-    buildAttributesFilterTypes(contactAttributes.value, getOperatorTypes)
+    buildAttributesFilterTypes(
+      contactAttributes.value,
+      getOperatorTypes,
+      'contact'
+    )
   );
 
   /**
@@ -67,8 +75,8 @@ export function useContactFilterContext() {
    */
   const filterTypes = computed(() => [
     {
-      attributeKey: 'name',
-      value: 'name',
+      attributeKey: CONTACT_ATTRIBUTES.NAME,
+      value: CONTACT_ATTRIBUTES.NAME,
       attributeName: t('CONTACTS_LAYOUT.FILTER.NAME'),
       label: t('CONTACTS_LAYOUT.FILTER.NAME'),
       inputType: 'plainText',
@@ -77,8 +85,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'email',
-      value: 'email',
+      attributeKey: CONTACT_ATTRIBUTES.EMAIL,
+      value: CONTACT_ATTRIBUTES.EMAIL,
       attributeName: t('CONTACTS_LAYOUT.FILTER.EMAIL'),
       label: t('CONTACTS_LAYOUT.FILTER.EMAIL'),
       inputType: 'plainText',
@@ -87,8 +95,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'phone_number',
-      value: 'phone_number',
+      attributeKey: CONTACT_ATTRIBUTES.PHONE_NUMBER,
+      value: CONTACT_ATTRIBUTES.PHONE_NUMBER,
       attributeName: t('CONTACTS_LAYOUT.FILTER.PHONE_NUMBER'),
       label: t('CONTACTS_LAYOUT.FILTER.PHONE_NUMBER'),
       inputType: 'plainText',
@@ -97,8 +105,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'identifier',
-      value: 'identifier',
+      attributeKey: CONTACT_ATTRIBUTES.IDENTIFIER,
+      value: CONTACT_ATTRIBUTES.IDENTIFIER,
       attributeName: t('CONTACTS_LAYOUT.FILTER.IDENTIFIER'),
       label: t('CONTACTS_LAYOUT.FILTER.IDENTIFIER'),
       inputType: 'plainText',
@@ -107,8 +115,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'country_code',
-      value: 'country_code',
+      attributeKey: CONTACT_ATTRIBUTES.COUNTRY_CODE,
+      value: CONTACT_ATTRIBUTES.COUNTRY_CODE,
       attributeName: t('FILTER.ATTRIBUTES.COUNTRY_NAME'),
       label: t('FILTER.ATTRIBUTES.COUNTRY_NAME'),
       inputType: 'searchSelect',
@@ -118,8 +126,8 @@ export function useContactFilterContext() {
       attributeModel: 'additional',
     },
     {
-      attributeKey: 'city',
-      value: 'city',
+      attributeKey: CONTACT_ATTRIBUTES.CITY,
+      value: CONTACT_ATTRIBUTES.CITY,
       attributeName: t('CONTACTS_LAYOUT.FILTER.CITY'),
       label: t('CONTACTS_LAYOUT.FILTER.CITY'),
       inputType: 'plainText',
@@ -128,8 +136,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'created_at',
-      value: 'created_at',
+      attributeKey: CONTACT_ATTRIBUTES.CREATED_AT,
+      value: CONTACT_ATTRIBUTES.CREATED_AT,
       attributeName: t('CONTACTS_LAYOUT.FILTER.CREATED_AT'),
       label: t('CONTACTS_LAYOUT.FILTER.CREATED_AT'),
       inputType: 'date',
@@ -138,8 +146,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'last_activity_at',
-      value: 'last_activity_at',
+      attributeKey: CONTACT_ATTRIBUTES.LAST_ACTIVITY_AT,
+      value: CONTACT_ATTRIBUTES.LAST_ACTIVITY_AT,
       attributeName: t('CONTACTS_LAYOUT.FILTER.LAST_ACTIVITY'),
       label: t('CONTACTS_LAYOUT.FILTER.LAST_ACTIVITY'),
       inputType: 'date',
@@ -148,8 +156,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'referer',
-      value: 'referer',
+      attributeKey: CONTACT_ATTRIBUTES.REFERER,
+      value: CONTACT_ATTRIBUTES.REFERER,
       attributeName: t('CONTACTS_LAYOUT.FILTER.REFERER_LINK'),
       label: t('CONTACTS_LAYOUT.FILTER.REFERER_LINK'),
       inputType: 'plainText',
@@ -158,8 +166,8 @@ export function useContactFilterContext() {
       attributeModel: 'standard',
     },
     {
-      attributeKey: 'blocked',
-      value: 'blocked',
+      attributeKey: CONTACT_ATTRIBUTES.BLOCKED,
+      value: CONTACT_ATTRIBUTES.BLOCKED,
       attributeName: t('CONTACTS_LAYOUT.FILTER.BLOCKED'),
       label: t('CONTACTS_LAYOUT.FILTER.BLOCKED'),
       inputType: 'searchSelect',
@@ -173,6 +181,20 @@ export function useContactFilterContext() {
           name: t('CONTACTS_LAYOUT.FILTER.BLOCKED_FALSE'),
         },
       ],
+      dataType: 'text',
+      filterOperators: equalityOperators.value,
+      attributeModel: 'standard',
+    },
+    {
+      attributeKey: CONTACT_ATTRIBUTES.LABELS,
+      value: CONTACT_ATTRIBUTES.LABELS,
+      attributeName: t('CONTACTS_FILTER.ATTRIBUTES.LABELS'),
+      label: t('CONTACTS_FILTER.ATTRIBUTES.LABELS'),
+      inputType: 'multiSelect',
+      options: labels.value?.map(label => ({
+        id: label.title,
+        name: label.title,
+      })),
       dataType: 'text',
       filterOperators: equalityOperators.value,
       attributeModel: 'standard',

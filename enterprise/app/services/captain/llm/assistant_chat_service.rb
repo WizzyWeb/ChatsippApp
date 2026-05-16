@@ -1,102 +1,80 @@
-require 'openai'
+class Captain::Llm::AssistantChatService < Llm::BaseAiService
+  include Captain::ChatHelper
 
-class Captain::Llm::AssistantChatService < Captain::Llm::BaseOpenAiService
-  def initialize(assistant: nil)
+  def initialize(assistant: nil, conversation: nil, source: nil)
     super()
 
     @assistant = assistant
+    @conversation = conversation
+    @conversation_id = conversation&.display_id
+    @source = source
+
     @messages = [system_message]
     @response = ''
+    @tools = build_tools
   end
 
-  def generate_response(input, previous_messages = [], role = 'user')
-    @messages += previous_messages
-    @messages << { role: role, content: input } if input.present?
+  # additional_message: A single message (String) from the user that should be appended to the chat.
+  #                    It can be an empty String or nil when you only want to supply historical messages.
+  # message_history:   An Array of already formatted messages that provide the previous context.
+  # role:              The role for the additional_message (defaults to `user`).
+  #
+  # NOTE: Parameters are provided as keyword arguments to improve clarity and avoid relying on
+  # positional ordering.
+  def generate_response(additional_message: nil, message_history: [], role: 'user')
+    @messages += message_history
+    @messages << { role: role, content: additional_message } if additional_message.present?
     request_chat_completion
   end
 
   private
 
-  def system_message
-    {
-      role: 'system',
-      content: Captain::Llm::SystemPromptsService.assistant_response_generator(@assistant.config['product_name'])
-    }
-  end
+  def build_tools
+    tools = [Captain::Tools::SearchDocumentationService.new(@assistant, user: nil)]
+    return tools unless custom_tools_enabled?
 
-  def search_documentation_tool
-    {
-      type: 'function',
-      function: {
-        name: 'search_documentation',
-        description: "Use this function to get documentation on functionalities you don't know about.",
-        parameters: {
-          type: 'object',
-          properties: {
-            search_query: {
-              type: 'string',
-              description: 'The search query to look up in the documentation.'
-            }
-          },
-          required: ['search_query']
-        }
-      }
-    }
-  end
-
-  def request_chat_completion
-    response = @client.chat(
-      parameters: {
-        model: DEFAULT_MODEL,
-        messages: @messages,
-        tools: [search_documentation_tool],
-        response_format: { type: 'json_object' }
-      }
-    )
-
-    handle_response(response)
-    @response
-  end
-
-  def handle_response(response)
-    message = response.dig('choices', 0, 'message')
-
-    if message['tool_calls']
-      process_tool_calls(message['tool_calls'])
-    else
-      @response = JSON.parse(message['content'].strip)
+    tools + @assistant.account.captain_custom_tools.enabled.map do |ct|
+      ct.tool(@assistant, base_class: Captain::Tools::CustomHttpTool, conversation: @conversation)
     end
   end
 
-  def process_tool_calls(tool_calls)
-    process_tool_call(tool_calls.first)
-  end
-
-  def process_tool_call(tool_call)
-    return unless tool_call['function']['name'] == 'search_documentation'
-
-    query = JSON.parse(tool_call['function']['arguments'])['search_query']
-    sections = fetch_documentation(query)
-    append_tool_response(sections)
-    request_chat_completion
-  end
-
-  def fetch_documentation(query)
-    @assistant
-      .responses
-      .approved
-      .search(query)
-      .map { |response| format_response(response) }.join
-  end
-
-  def format_response(response)
-    "\n\nQuestion: #{response[:question]}\nAnswer: #{response[:answer]}"
-  end
-
-  def append_tool_response(sections)
-    @messages << {
-      role: 'assistant',
-      content: "Found the following FAQs in the documentation:\n #{sections}"
+  def system_message
+    {
+      role: 'system',
+      content: Captain::Llm::SystemPromptsService.assistant_response_generator(
+        @assistant.name, @assistant.config['product_name'], @assistant.config,
+        contact: contact_attributes,
+        custom_tools: custom_tools_metadata
+      )
     }
+  end
+
+  def custom_tools_metadata
+    return [] unless custom_tools_enabled?
+
+    @assistant.account.captain_custom_tools.enabled.map do |ct|
+      { name: ct.slug, description: ct.description }
+    end
+  end
+
+  def custom_tools_enabled?
+    @assistant.account.feature_enabled?('custom_tools')
+  end
+
+  def contact_attributes
+    return nil unless @conversation&.contact
+    return nil unless @assistant&.feature_contact_attributes
+
+    @conversation.contact.attributes.symbolize_keys.slice(
+      :id, :name, :email, :phone_number, :identifier, :custom_attributes
+    )
+  end
+
+  def persist_message(message, message_type = 'assistant')
+    # No need to implement
+  end
+
+  def feature_name
+    'assistant'
   end
 end

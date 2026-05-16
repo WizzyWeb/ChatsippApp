@@ -12,25 +12,36 @@
       "ERROR_MESSAGE": "Nuk mund të dërgohej, provo sërish"
     }
   },
+  "THUMBNAIL": {
+    "AUTHOR": {
+      "NOT_AVAILABLE": "Nuk është i disponueshëm"
+    }
+  },
   "TEAM_AVAILABILITY": {
     "ONLINE": "Ne jemi online",
-    "OFFLINE": "Nuk jemi online për momentin"
+    "OFFLINE": "Nuk jemi online për momentin",
+    "BACK_AS_SOON_AS_POSSIBLE": "We will be back as soon as possible"
   },
   "REPLY_TIME": {
     "IN_A_FEW_MINUTES": "Zakonisht përgjigjet brenda pak minutash",
     "IN_A_FEW_HOURS": "Zakonisht përgjigjemi brenda disa orësh",
     "IN_A_DAY": "Zakonisht përgjigjemi brenda një dite",
-    "BACK_IN": "Ne do të kthehemi serish online"
+    "BACK_IN_HOURS": "We will be back online in {n} hour | We will be back online in {n} hours",
+    "BACK_IN_MINUTES": "We will be back online in {time} minutes",
+    "BACK_AT_TIME": "We will be back online at {time}",
+    "BACK_ON_DAY": "We will be back online on {day}",
+    "BACK_TOMORROW": "We will be back online tomorrow",
+    "BACK_IN_SOME_TIME": "We will be back online in some time"
   },
-  "DAY_NAMES": [
-    "E diele",
-    "E Hënë",
-    "E Martë",
-    "E Mërkurë",
-    "E Enjte",
-    "E Premte",
-    "E Shtunë"
-  ],
+  "DAY_NAMES": {
+    "SUNDAY": "E diele",
+    "MONDAY": "E Hënë",
+    "TUESDAY": "E Martë",
+    "WEDNESDAY": "E Mërkurë",
+    "THURSDAY": "E Enjte",
+    "FRIDAY": "E Premte",
+    "SATURDAY": "E Shtunë"
+  },
   "START_CONVERSATION": "Hap Bisedën",
   "END_CONVERSATION": "Mbyll bisedën",
   "CONTINUE_CONVERSATION": "Vazhdo bisedën",

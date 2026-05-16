@@ -88,23 +88,16 @@ export default {
 </script>
 
 <template>
-  <div
-    class="border border-slate-25 dark:border-slate-800/60 overflow-x-auto bg-white dark:bg-slate-900 h-full p-6 w-full max-w-full md:w-3/4 md:max-w-[75%] flex-shrink-0 flex-grow-0"
-  >
-    <form
-      class="flex flex-wrap mx-0 overflow-x-auto"
-      @submit.prevent="addAgents"
-    >
-      <div class="w-full">
-        <PageHeader
-          :header-title="headerTitle"
-          :header-content="$t('TEAMS_SETTINGS.ADD.DESC')"
-        />
-      </div>
+  <div class="h-full w-full p-8 col-span-6 overflow-auto">
+    <form class="flex flex-col gap-4 mx-0" @submit.prevent="addAgents">
+      <PageHeader
+        :header-title="headerTitle"
+        :header-content="$t('TEAMS_SETTINGS.ADD.DESC')"
+      />
 
-      <div class="w-full">
+      <div class="w-full h-full">
         <div v-if="v$.selectedAgents.$error">
-          <p class="error-message">
+          <p class="error-message pb-2">
             {{ $t('TEAMS_SETTINGS.ADD.AGENT_VALIDATION_ERROR') }}
           </p>
         </div>

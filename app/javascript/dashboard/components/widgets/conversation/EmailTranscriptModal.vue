@@ -2,8 +2,12 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required, minLength, email } from '@vuelidate/validators';
 import { useAlert } from 'dashboard/composables';
+import NextButton from 'dashboard/components-next/button/Button.vue';
 
 export default {
+  components: {
+    NextButton,
+  },
   props: {
     show: {
       type: Boolean,
@@ -81,7 +85,12 @@ export default {
         useAlert(this.$t('EMAIL_TRANSCRIPT.SEND_EMAIL_SUCCESS'));
         this.onCancel();
       } catch (error) {
-        useAlert(this.$t('EMAIL_TRANSCRIPT.SEND_EMAIL_ERROR'));
+        const status = error?.response?.status;
+        if (status === 402) {
+          useAlert(this.$t('EMAIL_TRANSCRIPT.SEND_EMAIL_PAYMENT_REQUIRED'));
+        } else {
+          useAlert(this.$t('EMAIL_TRANSCRIPT.SEND_EMAIL_ERROR'));
+        }
       } finally {
         this.isSubmitting = false;
       }
@@ -153,13 +162,18 @@ export default {
           </div>
         </div>
         <div class="flex flex-row justify-end w-full gap-2 px-0 py-2">
-          <woot-submit-button
-            :button-text="$t('EMAIL_TRANSCRIPT.SUBMIT')"
+          <NextButton
+            faded
+            slate
+            type="reset"
+            :label="$t('EMAIL_TRANSCRIPT.CANCEL')"
+            @click.prevent="onCancel"
+          />
+          <NextButton
+            type="submit"
+            :label="$t('EMAIL_TRANSCRIPT.SUBMIT')"
             :disabled="!isFormValid"
           />
-          <button class="button clear" @click.prevent="onCancel">
-            {{ $t('EMAIL_TRANSCRIPT.CANCEL') }}
-          </button>
         </div>
       </form>
     </div>

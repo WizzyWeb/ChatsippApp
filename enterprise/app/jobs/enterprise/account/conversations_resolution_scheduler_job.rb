@@ -9,7 +9,14 @@ module Enterprise::Account::ConversationsResolutionSchedulerJob
 
   def resolve_captain_conversations
     CaptainInbox.all.find_each(batch_size: 100) do |captain_inbox|
-      Captain::InboxPendingConversationsResolutionJob.perform_later(captain_inbox.inbox)
+      inbox = captain_inbox.inbox
+
+      next if inbox.email?
+      next if inbox.account.captain_auto_resolve_disabled?
+
+      Captain::InboxPendingConversationsResolutionJob.perform_later(
+        inbox
+      )
     end
   end
 end

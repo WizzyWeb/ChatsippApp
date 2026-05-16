@@ -1,15 +1,20 @@
-class Captain::Llm::ConversationFaqService < Captain::Llm::BaseOpenAiService
+class Captain::Llm::ConversationFaqService < Llm::BaseAiService
+  include Integrations::LlmInstrumentation
+
   DISTANCE_THRESHOLD = 0.3
 
-  def initialize(assistant, conversation, model = DEFAULT_MODEL)
+  def initialize(assistant, conversation)
     super()
     @assistant = assistant
     @conversation = conversation
     @content = conversation.to_llm_text
-    @model = model
   end
 
+  # Generates and deduplicates FAQs from conversation content
+  # Skips processing if there was no human interaction
   def generate_and_deduplicate
+    return [] if no_human_interaction?
+
     new_faqs = generate
     return [] if new_faqs.empty?
 
@@ -22,13 +27,17 @@ class Captain::Llm::ConversationFaqService < Captain::Llm::BaseOpenAiService
 
   attr_reader :content, :conversation, :assistant
 
+  def no_human_interaction?
+    conversation.first_reply_created_at.nil?
+  end
+
   def find_and_separate_duplicates(faqs)
     duplicate_faqs = []
     unique_faqs = []
 
     faqs.each do |faq|
       combined_text = "#{faq['question']}: #{faq['answer']}"
-      embedding = Captain::Llm::EmbeddingService.new.get_embedding(combined_text)
+      embedding = Captain::Llm::EmbeddingService.new(account_id: @conversation.account_id).get_embedding(combined_text)
       similar_faqs = find_similar_faqs(embedding)
 
       if similar_faqs.any?
@@ -74,36 +83,43 @@ class Captain::Llm::ConversationFaqService < Captain::Llm::BaseOpenAiService
   end
 
   def generate
-    response = @client.chat(parameters: chat_parameters)
-    parse_response(response)
-  rescue OpenAI::Error => e
-    Rails.logger.error "OpenAI API Error: #{e.message}"
+    response = instrument_llm_call(instrumentation_params) do
+      chat
+        .with_params(response_format: { type: 'json_object' })
+        .with_instructions(system_prompt)
+        .ask(@content)
+    end
+    parse_response(response.content)
+  rescue RubyLLM::Error => e
+    Rails.logger.error "LLM API Error: #{e.message}"
     []
   end
 
-  def chat_parameters
-    prompt = Captain::Llm::SystemPromptsService.conversation_faq_generator
+  def instrumentation_params
     {
+      span_name: 'llm.captain.conversation_faq',
       model: @model,
-      response_format: { type: 'json_object' },
+      temperature: @temperature,
+      account_id: @conversation.account_id,
+      conversation_id: @conversation.display_id,
+      feature_name: 'conversation_faq',
       messages: [
-        {
-          role: 'system',
-          content: prompt
-        },
-        {
-          role: 'user',
-          content: content
-        }
-      ]
+        { role: 'system', content: system_prompt },
+        { role: 'user', content: @content }
+      ],
+      metadata: { assistant_id: @assistant.id }
     }
   end
 
-  def parse_response(response)
-    content = response.dig('choices', 0, 'message', 'content')
-    return [] if content.nil?
+  def system_prompt
+    account_language = @conversation.account.locale_english_name
+    Captain::Llm::SystemPromptsService.conversation_faq_generator(account_language)
+  end
 
-    JSON.parse(content.strip).fetch('faqs', [])
+  def parse_response(response)
+    return [] if response.nil?
+
+    JSON.parse(sanitize_json_response(response)).fetch('faqs', [])
   rescue JSON::ParserError => e
     Rails.logger.error "Error in parsing GPT processed response: #{e.message}"
     []

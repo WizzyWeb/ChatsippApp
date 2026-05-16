@@ -3,7 +3,7 @@
     "HEADER": "Samtöl",
     "LOADING_CHART": "Loading chart data...",
     "NO_ENOUGH_DATA": "Við höfum ekki fengið nógu marga gagnapunkta til að búa til skýrslu, vinsamlegast reyndu aftur síðar.",
-    "DOWNLOAD_AGENT_REPORTS": "Download agent reports",
+    "DOWNLOAD_CONVERSATION_REPORTS": "Download conversation reports",
     "DATA_FETCHING_FAILED": "Failed to fetch data, please try again later.",
     "SUMMARY_FETCHING_FAILED": "Failed to fetch summary, please try again later.",
     "METRICS": {
@@ -51,7 +51,10 @@
     },
     "DATE_RANGE_OPTIONS": {
       "LAST_7_DAYS": "Síðustu 7 daga",
+      "LAST_14_DAYS": "Síðustu 14 daga",
       "LAST_30_DAYS": "Síðustu 30 daga",
+      "THIS_MONTH": "This month",
+      "LAST_MONTH": "Last month",
       "LAST_3_MONTHS": "Síðustu 3 mánuði",
       "LAST_6_MONTHS": "Síðustu 6 mánuði",
       "LAST_YEAR": "Síðasta ár",
@@ -119,15 +122,22 @@
       "EMPTY_LIST": "Engar niðurstöður fundust"
     },
     "PAGINATION": {
-      "RESULTS": "Showing {start} to {end} of {total} results"
+      "RESULTS": "Showing {start} to {end} of {total} results",
+      "PER_PAGE_TEMPLATE": "{size} / page"
     }
   },
   "AGENT_REPORTS": {
     "HEADER": "Agents Overview",
+    "DESCRIPTION": "Easily track agent performance with key metrics such as conversations, response times, resolution times, and resolved cases. Click an agent's name to learn more.",
     "LOADING_CHART": "Loading chart data...",
     "NO_ENOUGH_DATA": "Við höfum ekki fengið nógu marga gagnapunkta til að búa til skýrslu, vinsamlegast reyndu aftur síðar.",
     "DOWNLOAD_AGENT_REPORTS": "Download agent reports",
     "FILTER_DROPDOWN_LABEL": "Veldu Þjónustufulltrúa",
+    "FILTERS": {
+      "INPUT_PLACEHOLDER": {
+        "AGENTS": "Leita að þjónustufulltrúum"
+      }
+    },
     "METRICS": {
       "CONVERSATIONS": {
         "NAME": "Samtöl",
@@ -191,10 +201,16 @@
   },
   "LABEL_REPORTS": {
     "HEADER": "Labels Overview",
+    "DESCRIPTION": "Track label performance with key metrics including conversations, response times, resolution times, and resolved cases. Click a label name for detailed insights.",
     "LOADING_CHART": "Loading chart data...",
     "NO_ENOUGH_DATA": "Við höfum ekki fengið nógu marga gagnapunkta til að búa til skýrslu, vinsamlegast reyndu aftur síðar.",
     "DOWNLOAD_LABEL_REPORTS": "Download label reports",
     "FILTER_DROPDOWN_LABEL": "Select Label",
+    "FILTERS": {
+      "INPUT_PLACEHOLDER": {
+        "LABELS": "Leita að merkingum"
+      }
+    },
     "METRICS": {
       "CONVERSATIONS": {
         "NAME": "Samtöl",
@@ -258,10 +274,18 @@
   },
   "INBOX_REPORTS": {
     "HEADER": "Inbox Overview",
+    "DESCRIPTION": "Quickly view your inbox performance with key metrics like conversations, response times, resolution times, and resolved cases—all in one place. Click an inbox name for more details.",
     "LOADING_CHART": "Loading chart data...",
     "NO_ENOUGH_DATA": "Við höfum ekki fengið nógu marga gagnapunkta til að búa til skýrslu, vinsamlegast reyndu aftur síðar.",
     "DOWNLOAD_INBOX_REPORTS": "Download inbox reports",
     "FILTER_DROPDOWN_LABEL": "Select Inbox",
+    "ALL_INBOXES": "All Inboxes",
+    "SEARCH_INBOX": "Search Inbox",
+    "FILTERS": {
+      "INPUT_PLACEHOLDER": {
+        "INBOXES": "Search inboxes"
+      }
+    },
     "METRICS": {
       "CONVERSATIONS": {
         "NAME": "Samtöl",
@@ -325,10 +349,19 @@
   },
   "TEAM_REPORTS": {
     "HEADER": "Team Overview",
+    "DESCRIPTION": "Get a snapshot of your team's performance with essential metrics, including conversations, response times, resolution times, and resolved cases. Click a team name for more details.",
     "LOADING_CHART": "Loading chart data...",
     "NO_ENOUGH_DATA": "Við höfum ekki fengið nógu marga gagnapunkta til að búa til skýrslu, vinsamlegast reyndu aftur síðar.",
     "DOWNLOAD_TEAM_REPORTS": "Download team reports",
     "FILTER_DROPDOWN_LABEL": "Select Team",
+    "FILTERS": {
+      "ADD_FILTER": "Add filter",
+      "CLEAR_ALL": "Clear all",
+      "NO_FILTER": "No filters available",
+      "INPUT_PLACEHOLDER": {
+        "TEAMS": "Leita að teymum"
+      }
+    },
     "METRICS": {
       "CONVERSATIONS": {
         "NAME": "Samtöl",
@@ -392,22 +425,48 @@
   },
   "CSAT_REPORTS": {
     "HEADER": "CSAT Reports",
-    "NO_RECORDS": "Engin svör við CSAT könnun eru fáanleg.",
+    "NO_RECORDS": "No responses yet",
+    "NO_RECORDS_DESCRIPTION": "CSAT survey responses will appear here once customers start providing feedback.",
     "DOWNLOAD": "Download CSAT Reports",
     "DOWNLOAD_FAILED": "Failed to download CSAT Reports",
     "FILTERS": {
+      "ADD_FILTER": "Add filter",
+      "CLEAR_ALL": "Clear all",
+      "NO_FILTER": "No filters available",
+      "INPUT_PLACEHOLDER": {
+        "AGENTS": "Leita að þjónustufulltrúum",
+        "INBOXES": "Search inboxes",
+        "TEAMS": "Leita að teymum",
+        "RATINGS": "Search ratings"
+      },
       "AGENTS": {
-        "PLACEHOLDER": "Choose Agents"
+        "LABEL": "Þjónustufulltrúi"
+      },
+      "INBOXES": {
+        "LABEL": "Innhólf"
+      },
+      "TEAMS": {
+        "LABEL": "Team"
+      },
+      "RATINGS": {
+        "LABEL": "Rating"
       }
     },
     "TABLE": {
       "HEADER": {
         "CONTACT_NAME": "Contact",
-        "AGENT_NAME": "Assigned agent",
+        "AGENT_NAME": "Þjónustufulltrúi",
         "RATING": "Rating",
-        "FEEDBACK_TEXT": "Feedback comment"
-      }
+        "FEEDBACK_TEXT": "Feedback comment",
+        "CONVERSATION": "Conversation",
+        "CUSTOMER": "Customer",
+        "RESPONSE": "Response",
+        "HANDLED_BY": "Handled by"
+      },
+      "UNKNOWN_CUSTOMER": "Unknown customer"
     },
+    "NO_AGENT": "No assigned agent",
+    "NO_FEEDBACK": "No feedback provided",
     "METRIC": {
       "TOTAL_RESPONSES": {
         "LABEL": "Total responses",
@@ -420,6 +479,25 @@
       "RESPONSE_RATE": {
         "LABEL": "Response rate",
         "TOOLTIP": "Heildarfjöldi svara / Heildarfjöldi sendra CSAT könnunarskilaboða * 100"
+      },
+      "RATING_DISTRIBUTION": "Rating distribution"
+    },
+    "REVIEW_NOTES": {
+      "TITLE": "Review notes",
+      "PLACEHOLDER": "Add review notes about this rating...",
+      "SAVE": "Save",
+      "CANCEL": "Hætta við",
+      "SAVING": "Saving...",
+      "SAVED": "Notes saved successfully",
+      "SAVE_ERROR": "Failed to save notes",
+      "UPDATED_BY": "Updated by {name} {time}",
+      "UPDATED_BY_LABEL": "Updated by",
+      "PAYWALL": {
+        "TITLE": "Upgrade to add review notes",
+        "AVAILABLE_ON": "The review notes feature is only available in the Business and Enterprise plans.",
+        "UPGRADE_PROMPT": "Add internal context to every CSAT response with review notes. Capture what really happened, spot patterns faster, and make better decisions from your feedback.",
+        "UPGRADE_NOW": "Upgrade now",
+        "CANCEL_ANYTIME": "You can change or cancel your plan anytime"
       }
     }
   },
@@ -462,12 +540,31 @@
       "CONVERSATIONS": "{count} conversations",
       "DOWNLOAD_REPORT": "Download report"
     },
+    "RESOLUTION_HEATMAP": {
+      "HEADER": "Resolutions",
+      "NO_CONVERSATIONS": "No conversations",
+      "CONVERSATION": "{count} conversation",
+      "CONVERSATIONS": "{count} conversations",
+      "DOWNLOAD_REPORT": "Download report"
+    },
     "AGENT_CONVERSATIONS": {
       "HEADER": "Conversations by agents",
       "LOADING_MESSAGE": "Loading agent metrics...",
       "NO_AGENTS": "There are no conversations by agents",
       "TABLE_HEADER": {
         "AGENT": "Þjónustufulltrúi",
+        "OPEN": "Opin",
+        "UNATTENDED": "Unattended",
+        "STATUS": "Staða"
+      }
+    },
+    "TEAM_CONVERSATIONS": {
+      "ALL_TEAMS": "All Teams",
+      "HEADER": "Conversations by teams",
+      "LOADING_MESSAGE": "Loading team metrics...",
+      "NO_TEAMS": "There is no data available",
+      "TABLE_HEADER": {
+        "TEAM": "Team",
         "OPEN": "Opin",
         "UNATTENDED": "Unattended",
         "STATUS": "Staða"
@@ -538,5 +635,16 @@
       },
       "VIEW_DETAILS": "View Details"
     }
+  },
+  "SUMMARY_REPORTS": {
+    "INBOX": "Innhólf",
+    "AGENT": "Þjónustufulltrúi",
+    "TEAM": "Team",
+    "LABEL": "Label",
+    "AVG_RESOLUTION_TIME": "Avg. Resolution Time",
+    "AVG_FIRST_RESPONSE_TIME": "Avg. First Response Time",
+    "AVG_REPLY_TIME": "Avg. Customer Waiting Time",
+    "RESOLUTION_COUNT": "Resolution Count",
+    "CONVERSATIONS": "No. of conversations"
   }
 }

@@ -1,10 +1,11 @@
 <script>
 // components
-import WootButton from '../../../ui/WootButton.vue';
-import Avatar from '../../Avatar.vue';
+import NextButton from 'dashboard/components-next/button/Button.vue';
+import Avatar from 'dashboard/components-next/avatar/Avatar.vue';
+import { useBranding } from 'shared/composables/useBranding';
 
 // composables
-import { useAI } from 'dashboard/composables/useAI';
+import { useCaptain } from 'dashboard/composables/useCaptain';
 import { useTrack } from 'dashboard/composables';
 
 // store & api
@@ -13,13 +14,13 @@ import { mapGetters } from 'vuex';
 // utils & constants
 import { LocalStorage } from 'shared/helpers/localStorage';
 import { LOCAL_STORAGE_KEYS } from 'dashboard/constants/localStorage';
-import { OPEN_AI_EVENTS } from '../../../../helper/AnalyticsHelper/events';
+import { CAPTAIN_EVENTS } from '../../../../helper/AnalyticsHelper/events';
 
 export default {
   name: 'LabelSuggestion',
   components: {
     Avatar,
-    WootButton,
+    NextButton,
   },
   props: {
     suggestedLabels: {
@@ -33,9 +34,10 @@ export default {
     },
   },
   setup() {
-    const { isAIIntegrationEnabled } = useAI();
+    const { captainTasksEnabled } = useCaptain();
+    const { replaceInstallationName } = useBranding();
 
-    return { isAIIntegrationEnabled };
+    return { captainTasksEnabled, replaceInstallationName };
   },
   data() {
     return {
@@ -78,7 +80,7 @@ export default {
     },
     shouldShowSuggestions() {
       if (this.isDismissed) return false;
-      if (!this.isAIIntegrationEnabled) return false;
+      if (!this.captainTasksEnabled) return false;
 
       return this.preparedLabels.length && this.chatLabels.length === 0;
     },
@@ -114,7 +116,7 @@ export default {
 
       // dismiss this once the values are set
       this.isDismissed = true;
-      this.trackLabelEvent(OPEN_AI_EVENTS.DISMISS_LABEL_SUGGESTION);
+      this.trackLabelEvent(CAPTAIN_EVENTS.LABEL_SUGGESTION_DISMISSED);
     },
     isConversationDismissed() {
       return LocalStorage.getFlag(
@@ -132,7 +134,7 @@ export default {
         conversationId: this.conversationId,
         labels: labelsToAdd,
       });
-      this.trackLabelEvent(OPEN_AI_EVENTS.APPLY_LABEL_SUGGESTION);
+      this.trackLabelEvent(CAPTAIN_EVENTS.LABEL_SUGGESTION_APPLIED);
     },
     trackLabelEvent(event) {
       const payload = {
@@ -154,7 +156,7 @@ export default {
 <template>
   <li
     v-if="shouldShowSuggestions"
-    class="label-suggestion right"
+    class="label-suggestion right list-none"
     @mouseover="isHovered = true"
     @mouseleave="isHovered = false"
   >
@@ -180,64 +182,64 @@ export default {
             <woot-label
               variant="dashed"
               v-bind="label"
-              :bg-color="
-                selectedLabels.includes(label.title) ? 'var(--w-100)' : ''
-              "
+              :bg-color="selectedLabels.includes(label.title) ? '#2781F6' : ''"
             />
           </button>
-          <WootButton
+          <NextButton
             v-if="preparedLabels.length === 1"
             v-tooltip.top="{
               content: $t('LABEL_MGMT.SUGGESTIONS.TOOLTIP.DISMISS'),
               delay: { show: 600, hide: 0 },
               hideOnClick: true,
             }"
-            variant="smooth"
-            :color-scheme="isHovered ? 'alert' : 'primary'"
-            class="label--add"
-            icon="dismiss"
-            size="tiny"
+            faded
+            xs
+            icon="i-lucide-x"
+            class="flex-shrink-0"
+            :color="isHovered ? 'ruby' : 'blue'"
             @click="dismissSuggestions"
           />
         </div>
-        <div v-if="preparedLabels.length > 1">
-          <WootButton
-            :variant="selectedLabels.length === 0 ? 'smooth' : ''"
-            class="label--add"
-            icon="add"
-            size="tiny"
+        <div
+          v-if="preparedLabels.length > 1"
+          class="inline-flex items-center gap-1"
+        >
+          <NextButton
+            xs
+            icon="i-lucide-plus"
+            class="flex-shrink-0"
+            :variant="selectedLabels.length === 0 ? 'faded' : 'solid'"
+            :label="addButtonText"
             @click="addAllLabels"
-          >
-            {{ addButtonText }}
-          </WootButton>
-          <WootButton
+          />
+          <NextButton
             v-tooltip.top="{
               content: $t('LABEL_MGMT.SUGGESTIONS.TOOLTIP.DISMISS'),
               delay: { show: 600, hide: 0 },
               hideOnClick: true,
             }"
-            :color-scheme="isHovered ? 'alert' : 'primary'"
-            variant="smooth"
-            class="label--add"
-            icon="dismiss"
-            size="tiny"
+            faded
+            xs
+            icon="i-lucide-x"
+            class="flex-shrink-0"
+            :color="isHovered ? 'ruby' : 'blue'"
             @click="dismissSuggestions"
           />
         </div>
       </div>
       <div class="sender--info has-tooltip" data-original-title="null">
-        <woot-thumbnail
+        <Avatar
           v-tooltip.top="{
-            content: $t('LABEL_MGMT.SUGGESTIONS.POWERED_BY'),
+            content: replaceInstallationName(
+              $t('LABEL_MGMT.SUGGESTIONS.POWERED_BY')
+            ),
             delay: { show: 600, hide: 0 },
             hideOnClick: true,
           }"
-          size="16px"
-        >
-          <Avatar class="user-thumbnail thumbnail-rounded">
-            <fluent-icon class="chatwoot-ai-icon" icon="chatwoot-ai" />
-          </Avatar>
-        </woot-thumbnail>
+          :size="16"
+          name="chatwoot-ai"
+          icon-name="i-lucide-sparkles"
+        />
       </div>
     </div>
   </li>
@@ -251,17 +253,14 @@ export default {
 .label-suggestion {
   flex-direction: row;
   justify-content: flex-end;
-  margin-top: var(--space-normal);
+  margin-top: 1rem;
 
   .label-suggestion--container {
     max-width: 300px;
   }
 
   .label-suggestion--options {
-    text-align: right;
-    display: flex;
-    align-items: center;
-    gap: var(--space-micro);
+    @apply gap-0.5 text-end flex items-center;
 
     button.label-suggestion--option {
       .label {
@@ -271,15 +270,8 @@ export default {
     }
   }
 
-  .chatwoot-ai-icon {
-    height: var(--font-size-mini);
-    width: var(--font-size-mini);
-  }
-
   .label-suggestion--title {
-    color: var(--b-600);
-    margin-top: var(--space-micro);
-    font-size: var(--font-size-micro);
+    @apply text-n-slate-11 mt-0.5 text-xxs;
   }
 }
 </style>

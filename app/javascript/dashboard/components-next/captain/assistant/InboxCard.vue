@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n';
 import CardLayout from 'dashboard/components-next/CardLayout.vue';
 import DropdownMenu from 'dashboard/components-next/dropdown-menu/DropdownMenu.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
+import Policy from 'dashboard/components/policy.vue';
 import { INBOX_TYPES, getInboxIconByType } from 'dashboard/helper/inbox';
 
 const props = defineProps({
@@ -56,9 +57,10 @@ const menuItems = computed(() => [
   },
 ]);
 
-const icon = computed(() =>
-  getInboxIconByType(props.inbox.channel_type, '', 'outline')
-);
+const icon = computed(() => {
+  const { medium, channel_type: type } = props.inbox;
+  return getInboxIconByType(type, medium, 'outline');
+});
 
 const handleAction = ({ action, value }) => {
   toggleDropdown(false);
@@ -76,8 +78,9 @@ const handleAction = ({ action, value }) => {
         {{ inboxName }}
       </span>
       <div class="flex items-center gap-2">
-        <div
+        <Policy
           v-on-clickaway="() => toggleDropdown(false)"
+          :permissions="['administrator']"
           class="relative flex items-center group"
         >
           <Button
@@ -93,7 +96,7 @@ const handleAction = ({ action, value }) => {
             class="mt-1 ltr:right-0 rtl:left-0 top-full"
             @action="handleAction($event)"
           />
-        </div>
+        </Policy>
       </div>
     </div>
   </CardLayout>

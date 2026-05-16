@@ -2,44 +2,37 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SettingsHeader from './SettingsHeader.vue';
-
 const props = defineProps({
   headerTitle: { type: String, default: '' },
-  headerButtonText: { type: String, default: '' },
   icon: { type: String, default: '' },
   keepAlive: { type: Boolean, default: true },
-  newButtonRoutes: { type: Array, default: () => [] },
   showBackButton: { type: Boolean, default: false },
   backUrl: { type: [String, Object], default: '' },
-  showSidemenuIcon: { type: Boolean, default: true },
 });
 
 const { t } = useI18n();
 
-const showNewButton = computed(
-  () => props.newButtonRoutes.length !== 0 && !props.showBackButton
+const showSettingsHeader = computed(
+  () => props.headerTitle || props.icon || props.showBackButton
 );
 </script>
 
 <template>
-  <div
-    class="flex flex-1 h-full justify-between flex-col m-0 bg-n-background overflow-auto"
-  >
+  <div class="flex flex-col h-full m-0 bg-n-surface-1 w-full">
     <SettingsHeader
-      button-route="new"
+      v-if="showSettingsHeader"
       :icon="icon"
       :header-title="t(headerTitle)"
-      :button-text="t(headerButtonText)"
       :show-back-button="showBackButton"
       :back-url="backUrl"
-      :show-new-button="showNewButton"
-      :show-sidemenu-icon="showSidemenuIcon"
+      class="z-20 max-w-7xl w-full mx-auto"
     />
-    <router-view v-slot="{ Component }">
-      <keep-alive v-if="keepAlive">
-        <component :is="Component" />
+
+    <router-view v-slot="{ Component }" class="px-4 overflow-hidden">
+      <component :is="Component" v-if="!keepAlive" :key="$route.fullPath" />
+      <keep-alive v-else>
+        <component :is="Component" :key="$route.fullPath" />
       </keep-alive>
-      <component :is="Component" v-else />
     </router-view>
   </div>
 </template>

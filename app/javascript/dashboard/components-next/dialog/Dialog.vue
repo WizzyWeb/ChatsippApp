@@ -2,9 +2,9 @@
 import { ref, computed } from 'vue';
 import { OnClickOutside } from '@vueuse/components';
 import { useI18n } from 'vue-i18n';
-import { useMapGetter } from 'dashboard/composables/store.js';
 
 import Button from 'dashboard/components-next/button/Button.vue';
+import TeleportWithDirection from 'dashboard/components-next/TeleportWithDirection.vue';
 
 const props = defineProps({
   type: {
@@ -53,16 +53,20 @@ const props = defineProps({
     default: 'lg',
     validator: value => ['3xl', '2xl', 'xl', 'lg', 'md', 'sm'].includes(value),
   },
+  position: {
+    type: String,
+    default: 'center',
+    validator: value => ['center', 'top'].includes(value),
+  },
 });
 
 const emit = defineEmits(['confirm', 'close']);
 
 const { t } = useI18n();
 
-const isRTL = useMapGetter('accounts/isRTL');
-
 const dialogRef = ref(null);
 const dialogContentRef = ref(null);
+const isOpen = ref(false);
 
 const maxWidthClass = computed(() => {
   const classesMap = {
@@ -77,13 +81,32 @@ const maxWidthClass = computed(() => {
   return classesMap[props.width] ?? 'max-w-md';
 });
 
+const positionClass = computed(() =>
+  props.position === 'top' ? 'dialog-position-top' : ''
+);
+
 const open = () => {
+  isOpen.value = true;
   dialogRef.value?.showModal();
 };
+
 const close = () => {
   emit('close');
   dialogRef.value?.close();
+  isOpen.value = false;
 };
+
+// Only close if the close event originated from this dialog,
+// not from a child dialog (e.g. ProseMirror prompt) bubbling up.
+const handleDialogClose = e => e.target === dialogRef.value && close();
+
+// Only close on click-outside if this dialog is the topmost one.
+// If another dialog (e.g. ProseMirror prompt) is open on top, ignore.
+const handleClickOutside = () => {
+  const dialogs = document.querySelectorAll('dialog[open]');
+  if (dialogs[dialogs.length - 1] === dialogRef.value) close();
+};
+
 const confirm = () => {
   emit('confirm');
 };
@@ -92,21 +115,22 @@ defineExpose({ open, close });
 </script>
 
 <template>
-  <Teleport to="body">
+  <TeleportWithDirection to="body">
     <dialog
       ref="dialogRef"
       class="w-full transition-all duration-300 ease-in-out shadow-xl rounded-xl"
       :class="[
         maxWidthClass,
+        positionClass,
         overflowYAuto ? 'overflow-y-auto' : 'overflow-visible',
       ]"
-      :dir="isRTL ? 'rtl' : 'ltr'"
-      @close="close"
+      @close.prevent="handleDialogClose"
     >
-      <OnClickOutside @trigger="close">
-        <div
+      <OnClickOutside @trigger="handleClickOutside">
+        <form
           ref="dialogContentRef"
-          class="flex flex-col w-full h-auto gap-6 p-6 overflow-visible text-left align-middle transition-all duration-300 ease-in-out transform bg-n-alpha-3 backdrop-blur-[100px] shadow-xl rounded-xl"
+          class="flex flex-col w-full h-auto gap-6 p-6 overflow-visible text-start align-middle transition-all duration-300 ease-in-out transform bg-n-alpha-3 backdrop-blur-[100px] shadow-xl rounded-xl"
+          @submit.prevent="confirm"
           @click.stop
         >
           <div v-if="title || description" class="flex flex-col gap-2">
@@ -119,16 +143,20 @@ defineExpose({ open, close });
               </p>
             </slot>
           </div>
-          <slot />
+          <slot v-if="isOpen" />
           <!-- Dialog content will be injected here -->
           <slot name="footer">
-            <div class="flex items-center justify-between w-full gap-3">
+            <div
+              v-if="showCancelButton || showConfirmButton"
+              class="flex items-center justify-between w-full gap-3"
+            >
               <Button
                 v-if="showCancelButton"
                 variant="faded"
                 color="slate"
                 :label="cancelButtonLabel || t('DIALOG.BUTTONS.CANCEL')"
                 class="w-full"
+                type="button"
                 @click="close"
               />
               <Button
@@ -138,18 +166,23 @@ defineExpose({ open, close });
                 class="w-full"
                 :is-loading="isLoading"
                 :disabled="disableConfirmButton || isLoading"
-                @click="confirm"
+                type="submit"
               />
             </div>
           </slot>
-        </div>
+        </form>
       </OnClickOutside>
     </dialog>
-  </Teleport>
+  </TeleportWithDirection>
 </template>
 
 <style scoped>
 dialog::backdrop {
   @apply bg-n-alpha-black1 backdrop-blur-[4px];
+}
+
+.dialog-position-top {
+  margin-top: clamp(2rem, 5vh, 5rem);
+  margin-bottom: auto;
 }
 </style>

@@ -1,45 +1,37 @@
-<script>
-import { mapGetters } from 'vuex';
-import SearchResultConversationItem from './SearchResultConversationItem.vue';
+<script setup>
+import { useI18n } from 'vue-i18n';
+import { useMapGetter } from 'dashboard/composables/store.js';
+
+import SearchResultMessageItem from './SearchResultMessageItem.vue';
 import SearchResultSection from './SearchResultSection.vue';
 import MessageContent from './MessageContent.vue';
 
-export default {
-  components: {
-    SearchResultConversationItem,
-    SearchResultSection,
-    MessageContent,
+defineProps({
+  messages: {
+    type: Array,
+    default: () => [],
   },
-  props: {
-    messages: {
-      type: Array,
-      default: () => [],
-    },
-    query: {
-      type: String,
-      default: '',
-    },
-    isFetching: {
-      type: Boolean,
-      default: false,
-    },
-    showTitle: {
-      type: Boolean,
-      default: true,
-    },
+  query: {
+    type: String,
+    default: '',
   },
-  computed: {
-    ...mapGetters({
-      accountId: 'getCurrentAccountId',
-    }),
+  isFetching: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    getName(message) {
-      return message && message.sender && message.sender.name
-        ? message.sender.name
-        : this.$t('SEARCH.BOT_LABEL');
-    },
+  showTitle: {
+    type: Boolean,
+    default: true,
   },
+});
+const { t } = useI18n();
+
+const accountId = useMapGetter('getCurrentAccountId');
+
+const getName = message => {
+  return message && message.sender && message.sender.name
+    ? message.sender.name
+    : t('SEARCH.BOT_LABEL');
 };
 </script>
 
@@ -51,21 +43,23 @@ export default {
     :show-title="showTitle"
     :is-fetching="isFetching"
   >
-    <ul v-if="messages.length" class="space-y-1.5">
+    <ul v-if="messages.length" class="space-y-3 list-none">
       <li v-for="message in messages" :key="message.id">
-        <SearchResultConversationItem
-          :id="message.conversation_id"
+        <SearchResultMessageItem
+          :id="message.conversationId"
           :account-id="accountId"
-          :inbox="message.inbox"
-          :created-at="message.created_at"
+          :inbox-id="message.inboxId"
+          :created-at="message.createdAt"
           :message-id="message.id"
+          :is-private="message.private"
+          :attachments="message.attachments"
         >
           <MessageContent
             :author="getName(message)"
-            :content="message.content"
+            :message="message"
             :search-term="query"
           />
-        </SearchResultConversationItem>
+        </SearchResultMessageItem>
       </li>
     </ul>
   </SearchResultSection>

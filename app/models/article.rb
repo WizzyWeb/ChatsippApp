@@ -23,12 +23,17 @@
 #
 # Indexes
 #
+#  index_articles_on_account_id             (account_id)
 #  index_articles_on_associated_article_id  (associated_article_id)
 #  index_articles_on_author_id              (author_id)
+#  index_articles_on_portal_id              (portal_id)
 #  index_articles_on_slug                   (slug) UNIQUE
+#  index_articles_on_status                 (status)
+#  index_articles_on_views                  (views)
 #
 class Article < ApplicationRecord
   include PgSearch::Model
+  include LlmFormattable
 
   has_many :associated_articles,
            class_name: :Article,
@@ -53,7 +58,7 @@ class Article < ApplicationRecord
   validates :account_id, presence: true
   validates :author_id, presence: true
   validates :title, presence: true
-  validates :content, presence: true
+  validates :content, presence: true, if: :published?
 
   # ensuring that the position is always set correctly
   before_create :add_position_to_article
@@ -71,18 +76,24 @@ class Article < ApplicationRecord
   scope :order_by_views, -> { reorder(views: :desc) }
 
   # TODO: if text search slows down https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+  # - the A, B and C are for weightage. See: https://github.com/Casecommons/pg_search#weighting
+  # - the normalization is for ensuring the long articles that mention the search term too many times are not ranked higher.
+  #   it divides rank by log(document_length) to prevent longer articles from ranking higher just due to sizeSee: https://github.com/Casecommons/pg_search#normalization
+  # - the ranking is to ensure that articles with higher weightage are ranked higher
   pg_search_scope(
     :text_search,
-    against: %i[
-      title
-      description
-      content
-    ],
+    against: {
+      title: 'A',
+      description: 'B',
+      content: 'C'
+    },
     using: {
       tsearch: {
-        prefix: true
+        prefix: true,
+        normalization: 2
       }
-    }
+    },
+    ranked_by: ':tsearch'
   )
 
   def self.search(params)
@@ -121,11 +132,13 @@ class Article < ApplicationRecord
     # rubocop:enable Rails/SkipsModelValidations
   end
 
-  def self.update_positions(positions_hash)
-    positions_hash.each do |article_id, new_position|
-      # Find the article by its ID and update its position
-      article = Article.find(article_id)
-      article.update!(position: new_position)
+  def self.update_positions(portal:, positions_hash:)
+    return if positions_hash.blank?
+
+    transaction do
+      positions_hash.each do |article_id, new_position|
+        portal.articles.find(article_id).update!(position: new_position)
+      end
     end
   end
 

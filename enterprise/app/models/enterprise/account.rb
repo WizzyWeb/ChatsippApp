@@ -1,52 +1,57 @@
 module Enterprise::Account
-  def usage_limits
-    {
-      agents: agent_limits.to_i,
-      inboxes: get_limits(:inboxes).to_i
-    }
+  # TODO: Remove this when we upgrade administrate gem to the latest version
+  # this is a temporary method since current administrate doesn't support virtual attributes
+  def manually_managed_features; end
+
+  # Auto-sync advanced_assignment with assignment_v2 when features are bulk-updated via admin UI
+  def selected_feature_flags=(features)
+    super
+    sync_assignment_features
   end
 
-  def subscribed_features
-    plan_features = InstallationConfig.find_by(name: 'CHATWOOT_CLOUD_PLAN_FEATURES')&.value
-    return [] if plan_features.blank?
+  def mark_for_deletion(reason = 'manual_deletion')
+    reason = reason.to_s == 'manual_deletion' ? 'manual_deletion' : 'inactivity'
 
-    plan_features[plan_name]
+    result = custom_attributes.merge!(
+      'marked_for_deletion_at' => 7.days.from_now.iso8601,
+      'marked_for_deletion_reason' => reason
+    ) && save
+
+    # Send notification to admin users if the account was successfully marked for deletion
+    if result
+      mailer = AdministratorNotifications::AccountNotificationMailer.with(account: self)
+      if reason == 'manual_deletion'
+        mailer.account_deletion_user_initiated(self, reason).deliver_later
+      else
+        mailer.account_deletion_for_inactivity(self, reason).deliver_later
+      end
+    end
+
+    result
+  end
+
+  def unmark_for_deletion
+    custom_attributes.delete('marked_for_deletion_at') && custom_attributes.delete('marked_for_deletion_reason') && save
+  end
+
+  def saml_enabled?
+    saml_settings&.saml_enabled? || false
   end
 
   private
 
-  def plan_name
-    custom_attributes['plan_name']
+  def sync_assignment_features
+    if feature_enabled?('assignment_v2')
+      # Enable advanced_assignment for Business/Enterprise plans
+      send('feature_advanced_assignment=', true) if business_or_enterprise_plan?
+    else
+      # Disable advanced_assignment when assignment_v2 is disabled
+      send('feature_advanced_assignment=', false)
+    end
   end
 
-  def agent_limits
-    subscribed_quantity = custom_attributes['subscribed_quantity']
-    subscribed_quantity || get_limits(:agents)
-  end
-
-  def get_limits(limit_name)
-    config_name = "ACCOUNT_#{limit_name.to_s.upcase}_LIMIT"
-    return self[:limits][limit_name.to_s] if self[:limits][limit_name.to_s].present?
-
-    return GlobalConfig.get(config_name)[config_name] if GlobalConfig.get(config_name)[config_name].present?
-
-    ChatwootApp.max_limit
-  end
-
-  def validate_limit_keys
-    errors.add(:limits, ': Invalid data') unless self[:limits].is_a? Hash
-    self[:limits] = {} if self[:limits].blank?
-
-    limit_schema = {
-      'type' => 'object',
-      'properties' => {
-        'inboxes' => { 'type': 'number' },
-        'agents' => { 'type': 'number' }
-      },
-      'required' => [],
-      'additionalProperties' => false
-    }
-
-    errors.add(:limits, ': Invalid data') unless JSONSchemer.schema(limit_schema).valid?(self[:limits])
+  def business_or_enterprise_plan?
+    plan_name = custom_attributes['plan_name']
+    %w[Business Enterprise].include?(plan_name)
   end
 end

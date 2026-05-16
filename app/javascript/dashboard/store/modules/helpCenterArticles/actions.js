@@ -69,30 +69,9 @@ export const actions = {
     }
   },
 
-  updateAsync: async ({ commit }, { portalSlug, articleId, ...articleObj }) => {
-    commit(types.UPDATE_ARTICLE_FLAG, {
-      uiFlags: { isUpdating: true },
-      articleId,
-    });
-
-    try {
-      await articlesAPI.updateArticle({ portalSlug, articleId, articleObj });
-      return articleId;
-    } catch (error) {
-      return throwErrorMessage(error);
-    } finally {
-      commit(types.UPDATE_ARTICLE_FLAG, {
-        uiFlags: { isUpdating: false },
-        articleId,
-      });
-    }
-  },
-
   update: async ({ commit }, { portalSlug, articleId, ...articleObj }) => {
     commit(types.UPDATE_ARTICLE_FLAG, {
-      uiFlags: {
-        isUpdating: true,
-      },
+      uiFlags: { isUpdating: true },
       articleId,
     });
 
@@ -110,11 +89,24 @@ export const actions = {
       return throwErrorMessage(error);
     } finally {
       commit(types.UPDATE_ARTICLE_FLAG, {
-        uiFlags: {
-          isUpdating: false,
-        },
+        uiFlags: { isUpdating: false },
         articleId,
       });
+    }
+  },
+
+  updateArticleMeta: async ({ commit }, { portalSlug, locale }) => {
+    try {
+      const { data } = await articlesAPI.getArticles({
+        pageNumber: 1,
+        portalSlug,
+        locale,
+      });
+      const meta = camelcaseKeys(data.meta);
+      const { currentPage, ...metaWithoutCurrentPage } = meta;
+      commit(types.SET_ARTICLES_META, metaWithoutCurrentPage);
+    } catch (error) {
+      throwErrorMessage(error);
     }
   },
 
@@ -152,7 +144,17 @@ export const actions = {
     return fileUrl;
   },
 
-  reorder: async (_, { portalSlug, categorySlug, reorderedGroup }) => {
+  reorder: async (
+    { commit, state },
+    { portalSlug, categorySlug, reorderedGroup }
+  ) => {
+    // Save old positions so we can rollback on failure
+    const oldPositions = Object.keys(reorderedGroup).reduce((map, id) => {
+      map[id] = state.articles.byId[id]?.position;
+      return map;
+    }, {});
+    // Update positions in the store immediately so subsequent mutations preserve correct positions
+    commit(types.SET_ARTICLE_POSITIONS, reorderedGroup);
     try {
       await articlesAPI.reorderArticles({
         portalSlug,
@@ -160,9 +162,8 @@ export const actions = {
         categorySlug,
       });
     } catch (error) {
-      throwErrorMessage(error);
+      commit(types.SET_ARTICLE_POSITIONS, oldPositions);
+      throw error;
     }
-
-    return '';
   },
 };

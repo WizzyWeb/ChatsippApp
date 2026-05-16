@@ -3,8 +3,23 @@
     "HEADER": "Atributos personalizados",
     "HEADER_BTN_TXT": "Añadir atributo personalizado",
     "LOADING": "Obtener atributos personalizados",
-    "DESCRIPTION": "A custom attribute tracks additional details about your contacts or conversations—such as the subscription plan or the date of their first purchase. You can add different types of custom attributes, such as text, lists, or numbers, to capture the specific information you need.",
-    "LEARN_MORE": "Learn more about custom attributes",
+    "DESCRIPTION": "Un atributo personalizado rastrea detalles adicionales sobre tus contactos o conversaciones, como el plan de suscripción o la fecha de su primera compra. Puede agregar diferentes tipos de atributos personalizados, como textos, listas o números, para capturar la información específica que necesita.",
+    "LEARN_MORE": "Aprende más sobre los atributos personalizados",
+    "COUNT": "{n} attribute | {n} attributes",
+    "SEARCH_PLACEHOLDER": "Buscar atributos...",
+    "NO_RESULTS": "No attributes found matching your search",
+    "ATTRIBUTE_MODELS": {
+      "CONVERSATION": "Conversación",
+      "CONTACT": "Contacto"
+    },
+    "ATTRIBUTE_TYPES": {
+      "TEXT": "Texto",
+      "NUMBER": "Número",
+      "LINK": "Enlace",
+      "DATE": "Fecha",
+      "LIST": "Lista",
+      "CHECKBOX": "Casilla"
+    },
     "ADD": {
       "TITLE": "Añadir atributo personalizado",
       "SUBMIT": "Crear",
@@ -51,6 +66,10 @@
         },
         "ENABLE_REGEX": {
           "LABEL": "Habilitar validación regex"
+        },
+        "BADGES": {
+          "PRE_CHAT": "Pre-chat",
+          "RESOLUTION": "Resolución"
         }
       },
       "API": {
@@ -117,6 +136,10 @@
       "ENABLE_REGEX": {
         "LABEL": "Habilitar validación regex"
       }
+    },
+    "BADGES": {
+      "PRE_CHAT": "Pre-chat",
+      "RESOLUTION": "Resolución"
     }
   }
 }

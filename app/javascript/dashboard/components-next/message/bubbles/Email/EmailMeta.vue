@@ -14,7 +14,8 @@ const fromEmail = computed(() => {
 });
 
 const toEmail = computed(() => {
-  return contentAttributes.value?.email?.to ?? [];
+  const { toEmails, email } = contentAttributes.value;
+  return email?.to ?? toEmails ?? [];
 });
 
 const ccEmail = computed(() => {
@@ -26,7 +27,18 @@ const ccEmail = computed(() => {
 });
 
 const senderName = computed(() => {
-  return sender.value.name ?? '';
+  const fromEmailAddress = fromEmail.value[0] ?? '';
+  const senderEmail = sender.value.email ?? '';
+
+  if (!fromEmailAddress && !senderEmail) return null;
+
+  // if the sender of the conversation and the sender of this particular
+  // email are the same, only then we return the sender name
+  if (fromEmailAddress === senderEmail) {
+    return sender.value.name;
+  }
+
+  return null;
 });
 
 const bccEmail = computed(() => {
@@ -59,11 +71,19 @@ const showMeta = computed(() => {
     :class="hasError ? 'text-n-ruby-11' : 'text-n-slate-11'"
   >
     <template v-if="showMeta">
-      <div v-if="fromEmail[0]">
-        <span :class="hasError ? 'text-n-ruby-11' : 'text-n-slate-12'">
-          {{ senderName }}
-        </span>
-        &lt;{{ fromEmail[0] }}&gt;
+      <div
+        v-if="fromEmail[0]"
+        :class="hasError ? 'text-n-ruby-11' : 'text-n-slate-12'"
+      >
+        <template v-if="senderName">
+          <span>
+            {{ senderName }}
+          </span>
+          &lt;{{ fromEmail[0] }}&gt;
+        </template>
+        <template v-else>
+          {{ fromEmail[0] }}
+        </template>
       </div>
       <div v-if="toEmail.length">
         {{ $t('EMAIL_HEADER.TO') }}: {{ toEmail.join(', ') }}

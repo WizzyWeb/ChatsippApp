@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue';
 import SidebarGroupLeaf from './SidebarGroupLeaf.vue';
 import SidebarGroupSeparator from './SidebarGroupSeparator.vue';
-import SidebarGroupEmptyLeaf from './SidebarGroupEmptyLeaf.vue';
 
 import { useSidebarContext } from './provider';
 import { useEventListener } from '@vueuse/core';
@@ -19,15 +18,12 @@ const { isAllowed } = useSidebarContext();
 const scrollableContainer = ref(null);
 
 const accessibleItems = computed(() =>
-  props.children.filter(child => isAllowed(child.to))
+  props.children.filter(child => {
+    return child.to && isAllowed(child.to);
+  })
 );
 
 const hasAccessibleItems = computed(() => {
-  if (props.children.length === 0) {
-    // cases like segment, folder and labels where users can create new items
-    return true;
-  }
-
   return accessibleItems.value.length > 0;
 });
 
@@ -52,30 +48,31 @@ useEventListener(scrollableContainer, 'scroll', () => {
     :icon
     class="my-1"
   />
-  <ul class="m-0 list-none reset-base relative group">
+  <ul
+    v-if="children.length"
+    class="m-0 list-none reset-base relative group min-w-0"
+  >
     <!-- Each element has h-8, which is 32px, we will show 7 items with one hidden at the end,
     which is 14rem. Then we add 16px so that we have some text visible from the next item  -->
     <div
       ref="scrollableContainer"
+      class="min-w-0"
       :class="{
         'max-h-[calc(14rem+16px)] overflow-y-scroll no-scrollbar': isScrollable,
       }"
     >
-      <template v-if="children.length">
-        <SidebarGroupLeaf
-          v-for="child in children"
-          v-show="isExpanded || activeChild?.name === child.name"
-          v-bind="child"
-          :key="child.name"
-          :active="activeChild?.name === child.name"
-        />
-      </template>
-      <SidebarGroupEmptyLeaf v-else v-show="isExpanded" class="ml-3 rtl:mr-3" />
+      <SidebarGroupLeaf
+        v-for="child in children"
+        v-show="isExpanded || activeChild?.name === child.name"
+        v-bind="child"
+        :key="child.name"
+        :active="activeChild?.name === child.name"
+      />
     </div>
     <div
       v-if="isScrollable && isExpanded"
       v-show="!scrollEnd"
-      class="absolute bg-gradient-to-t from-n-solid-2 w-full h-12 to-transparent -bottom-1 pointer-events-none flex items-end justify-end px-2 animate-fade-in-up"
+      class="absolute bg-gradient-to-t from-n-background w-full h-12 to-transparent -bottom-1 pointer-events-none flex items-end justify-end px-2 animate-fade-in-up"
     >
       <svg
         width="16"

@@ -1,10 +1,13 @@
 <script setup>
+import { useAccount } from 'dashboard/composables/useAccount';
 import EmptyStateLayout from 'dashboard/components-next/EmptyStateLayout.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import AssistantCard from 'dashboard/components-next/captain/assistant/AssistantCard.vue';
+import FeatureSpotlight from 'dashboard/components-next/feature-spotlight/FeatureSpotlight.vue';
 import { assistantsList } from 'dashboard/components-next/captain/pageComponents/emptyStates/captainEmptyStateContent.js';
 
 const emit = defineEmits(['click']);
+const { isOnChatwootCloud } = useAccount();
 
 const onClick = () => {
   emit('click');
@@ -12,9 +15,19 @@ const onClick = () => {
 </script>
 
 <template>
+  <FeatureSpotlight
+    :title="$t('CAPTAIN.ASSISTANTS.EMPTY_STATE.FEATURE_SPOTLIGHT.TITLE')"
+    :note="$t('CAPTAIN.ASSISTANTS.EMPTY_STATE.FEATURE_SPOTLIGHT.NOTE')"
+    fallback-thumbnail="/assets/images/dashboard/captain/assistant-light.svg"
+    fallback-thumbnail-dark="/assets/images/dashboard/captain/assistant-dark.svg"
+    learn-more-url="https://chwt.app/captain-assistant"
+    class="mb-8"
+    :hide-actions="!isOnChatwootCloud"
+  />
   <EmptyStateLayout
     :title="$t('CAPTAIN.ASSISTANTS.EMPTY_STATE.TITLE')"
     :subtitle="$t('CAPTAIN.ASSISTANTS.EMPTY_STATE.SUBTITLE')"
+    :action-perms="['administrator']"
   >
     <template #empty-state-item>
       <div class="grid grid-cols-1 gap-4 p-px overflow-hidden">

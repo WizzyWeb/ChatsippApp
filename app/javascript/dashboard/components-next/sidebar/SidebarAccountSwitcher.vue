@@ -1,9 +1,11 @@
 <script setup>
+import { computed } from 'vue';
 import { useAccount } from 'dashboard/composables/useAccount';
 import { useMapGetter } from 'dashboard/composables/store';
 import { useI18n } from 'vue-i18n';
 import ButtonNext from 'next/button/Button.vue';
 import Icon from 'next/icon/Icon.vue';
+import Logo from 'next/icon/Logo.vue';
 
 import {
   DropdownContainer,
@@ -12,12 +14,31 @@ import {
   DropdownItem,
 } from 'next/dropdown-menu/base';
 
+defineProps({
+  isCollapsed: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const emit = defineEmits(['showCreateAccountModal']);
 
 const { t } = useI18n();
 const { accountId, currentAccount } = useAccount();
 const currentUser = useMapGetter('getCurrentUser');
 const globalConfig = useMapGetter('globalConfig/get');
+
+const userAccounts = useMapGetter('getUserAccounts');
+
+const showAccountSwitcher = computed(
+  () => userAccounts.value.length > 1 && currentAccount.value.name
+);
+
+const sortedCurrentUserAccounts = computed(() => {
+  return [...(currentUser.value.accounts || [])].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+});
 
 const onChangeAccount = newId => {
   const accountUrl = `/app/accounts/${newId}/dashboard`;
@@ -32,14 +53,31 @@ const emitNewAccount = () => {
 <template>
   <DropdownContainer>
     <template #trigger="{ toggle, isOpen }">
+      <!-- Collapsed view: Logo trigger -->
       <button
+        v-if="isCollapsed"
+        class="grid flex-shrink-0 place-content-center p-2 rounded-lg cursor-pointer hover:bg-n-alpha-1"
+        :class="{ 'bg-n-alpha-1': isOpen }"
+        :title="currentAccount.name"
+        @click="toggle"
+      >
+        <Logo class="size-7" />
+      </button>
+      <!-- Expanded view: Account name trigger -->
+      <button
+        v-else
         id="sidebar-account-switcher"
         :data-account-id="accountId"
         aria-haspopup="listbox"
         aria-controls="account-options"
-        class="flex items-center gap-2 justify-between w-full rounded-lg hover:bg-n-alpha-1 px-2"
-        :class="{ 'bg-n-alpha-1': isOpen }"
-        @click="toggle"
+        class="flex items-center gap-2 justify-between w-full rounded-lg px-2"
+        :class="[
+          isOpen && 'bg-n-alpha-1',
+          showAccountSwitcher
+            ? 'hover:bg-n-alpha-1 cursor-pointer'
+            : 'cursor-default',
+        ]"
+        @click="() => showAccountSwitcher && toggle()"
       >
         <span
           class="text-sm font-medium leading-5 text-n-slate-12 truncate"
@@ -49,15 +87,19 @@ const emitNewAccount = () => {
         </span>
 
         <span
+          v-if="showAccountSwitcher"
           aria-hidden="true"
           class="i-lucide-chevron-down size-4 text-n-slate-10 flex-shrink-0"
         />
       </button>
     </template>
-    <DropdownBody class="min-w-80 z-50">
-      <DropdownSection :title="t('SIDEBAR_ITEMS.SWITCH_WORKSPACE')">
+    <DropdownBody
+      v-if="showAccountSwitcher || isCollapsed"
+      class="min-w-80 z-50"
+    >
+      <DropdownSection :title="t('SIDEBAR_ITEMS.SWITCH_ACCOUNT')">
         <DropdownItem
-          v-for="account in currentUser.accounts"
+          v-for="account in sortedCurrentUserAccounts"
           :id="`account-${account.id}`"
           :key="account.id"
           class="cursor-pointer"

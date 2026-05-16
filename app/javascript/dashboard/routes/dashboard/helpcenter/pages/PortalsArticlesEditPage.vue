@@ -20,25 +20,30 @@ const articleById = useMapGetter('articles/articleById');
 
 const article = computed(() => articleById.value(articleSlug));
 
+const portalBySlug = useMapGetter('portals/portalBySlug');
+
+const portal = computed(() => portalBySlug.value(portalSlug));
+
 const isUpdating = ref(false);
 const isSaved = ref(false);
 
-const portalLink = computed(() => {
+const articleLink = computed(() => {
   const { slug: categorySlug, locale: categoryLocale } = article.value.category;
   const { slug: articleSlugValue } = article.value;
+  const portalCustomDomain = portal.value?.custom_domain;
   return buildPortalArticleURL(
     portalSlug,
     categorySlug,
     categoryLocale,
-    articleSlugValue
+    articleSlugValue,
+    portalCustomDomain
   );
 });
 
-const saveArticle = async ({ ...values }, isAsync = false) => {
-  const actionToDispatch = isAsync ? 'articles/updateAsync' : 'articles/update';
+const saveArticle = async ({ ...values }) => {
   isUpdating.value = true;
   try {
-    await store.dispatch(actionToDispatch, {
+    await store.dispatch('articles/update', {
       portalSlug,
       articleId: articleSlug,
       ...values,
@@ -54,10 +59,6 @@ const saveArticle = async ({ ...values }, isAsync = false) => {
       isSaved.value = true;
     }, 1500);
   }
-};
-
-const saveArticleAsync = async ({ ...values }) => {
-  saveArticle({ ...values }, true);
 };
 
 const isCategoryArticles = computed(() => {
@@ -91,7 +92,7 @@ const fetchArticleDetails = () => {
 };
 
 const previewArticle = () => {
-  window.open(portalLink.value, '_blank');
+  window.open(articleLink.value, '_blank');
   useTrack(PORTALS_EVENTS.PREVIEW_ARTICLE, {
     status: article.value?.status,
   });
@@ -106,7 +107,6 @@ onMounted(fetchArticleDetails);
     :is-updating="isUpdating"
     :is-saved="isSaved"
     @save-article="saveArticle"
-    @save-article-async="saveArticleAsync"
     @preview-article="previewArticle"
     @go-back="goBackToArticles"
   />

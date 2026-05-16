@@ -9,6 +9,7 @@
       "ADMINISTRATOR": "管理员",
       "AGENT": "客服"
     },
+    "COUNT": "{n} agent | {n} agents",
     "LIST": {
       "404": "此账号没有关联客服",
       "TITLE": "管理您团队中的客服",
@@ -96,6 +97,8 @@
         "ERROR_MESSAGE": "无法连接Woot服务器，请稍后再试"
       }
     },
+    "SEARCH_PLACEHOLDER": "搜索客服代表...",
+    "NO_RESULTS": "No agents found matching your search",
     "SEARCH": {
       "NO_RESULTS": "未找到任何结果。"
     },
@@ -105,6 +108,9 @@
         "AGENT": "选择客服代表",
         "TEAM": "选择团队"
       },
+      "LIST": {
+        "NONE": "无"
+      },
       "SEARCH": {
         "NO_RESULTS": {
           "AGENT": "未找到客服代表",
@@ -113,7 +119,7 @@
         "PLACEHOLDER": {
           "AGENT": "搜索客服代表",
           "TEAM": "查找团队",
-          "INPUT": "查找代理"
+          "INPUT": "查找客服代表"
         }
       }
     }

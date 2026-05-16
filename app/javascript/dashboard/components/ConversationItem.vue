@@ -10,11 +10,14 @@ export default {
     'assignAgent',
     'assignTeam',
     'assignLabels',
+    'removeLabels',
     'updateConversationStatus',
     'toggleContextMenu',
     'markAsUnread',
+    'markAsRead',
     'assignPriority',
     'isConversationSelected',
+    'deleteConversation',
   ],
   props: {
     source: {
@@ -47,7 +50,6 @@ export default {
 
 <template>
   <ConversationCard
-    :key="source.id"
     :active-label="label"
     :team-id="teamId"
     :folders-id="foldersId"
@@ -61,9 +63,12 @@ export default {
     @assign-agent="assignAgent"
     @assign-team="assignTeam"
     @assign-label="assignLabels"
+    @remove-label="removeLabels"
     @update-conversation-status="updateConversationStatus"
     @context-menu-toggle="toggleContextMenu"
     @mark-as-unread="markAsUnread"
+    @mark-as-read="markAsRead"
     @assign-priority="assignPriority"
+    @delete-conversation="deleteConversation"
   />
 </template>

@@ -15,8 +15,8 @@
     },
     "FILTER_ALL": "Todos",
     "ASSIGNEE_TYPE_TABS": {
-      "me": "Minha",
-      "unassigned": "Não atribuída",
+      "me": "Minhas",
+      "unassigned": "Não atribuídas",
       "all": "Todos"
     },
     "CHAT_STATUS_FILTER_ITEMS": {
@@ -24,22 +24,22 @@
         "TEXT": "Abertas"
       },
       "resolved": {
-        "TEXT": "Resolvida"
+        "TEXT": "Resolvidas"
       },
       "pending": {
-        "TEXT": "Pendente"
+        "TEXT": "Pendentes"
       },
       "snoozed": {
-        "TEXT": "Adiado"
+        "TEXT": "Adiadas"
       },
       "all": {
-        "TEXT": "Todos"
+        "TEXT": "Todas"
       }
     },
     "VIEW_FILTER": "Visualizar",
-    "SORT_TOOLTIP_LABEL": "Classificar conversas",
+    "SORT_TOOLTIP_LABEL": "Ordenar conversas",
     "CHAT_SORT": {
-      "STATUS": "Situação",
+      "STATUS": "Status",
       "ORDER_BY": "Ordenar por"
     },
     "CHAT_TIME_STAMP": {
@@ -76,6 +76,9 @@
       },
       "waiting_since_desc": {
         "TEXT": "Resposta pendente: Curtas primeiro"
+      },
+      "priority_desc_created_at_asc": {
+        "TEXT": "Prioridade: Maior primeiro, Criação: Mais antiga primeiro"
       }
     },
     "ATTACHMENTS": {
@@ -99,10 +102,16 @@
       },
       "fallback": {
         "CONTENT": "compartilhou uma URL"
+      },
+      "contact": {
+        "CONTENT": "Contato compartilhado"
+      },
+      "embed": {
+        "CONTENT": "Conteúdo incorporado"
       }
     },
     "CHAT_SORT_BY_FILTER": {
-      "TITLE": "Classificar conversas",
+      "TITLE": "Ordenar conversas",
       "DROPDOWN_TITLE": "Ordenar por",
       "ITEMS": {
         "LATEST": {
@@ -122,7 +131,7 @@
     "RECEIVED_VIA_EMAIL": "Recebido por e-mail",
     "VIEW_TWEET_IN_TWITTER": "Ver tweet no Twitter",
     "REPLY_TO_TWEET": "Responder a este tweet",
-    "LINK_TO_STORY": "Vá para o Story do Instagram",
+    "LINK_TO_STORY": "Ir para o Story do Instagram",
     "SENT": "Enviado com sucesso",
     "READ": "Lido com sucesso",
     "DELIVERED": "Entregue com sucesso",

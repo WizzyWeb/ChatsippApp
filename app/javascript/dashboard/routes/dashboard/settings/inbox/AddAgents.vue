@@ -4,6 +4,8 @@ import { mapGetters } from 'vuex';
 import { useAlert } from 'dashboard/composables';
 
 import InboxMembersAPI from '../../../../api/inboxMembers';
+import NextButton from 'dashboard/components-next/button/Button.vue';
+import TagInput from 'dashboard/components-next/taginput/TagInput.vue';
 import router from '../../../index';
 import PageHeader from '../SettingsSubPageHeader.vue';
 import { useVuelidate } from '@vuelidate/core';
@@ -11,11 +13,13 @@ import { useVuelidate } from '@vuelidate/core';
 export default {
   components: {
     PageHeader,
+    NextButton,
+    TagInput,
   },
   validations: {
-    selectedAgents: {
+    selectedAgentIds: {
       isEmpty() {
-        return !!this.selectedAgents.length;
+        return !!this.selectedAgentIds.length;
       },
     },
   },
@@ -24,7 +28,7 @@ export default {
   },
   data() {
     return {
-      selectedAgents: [],
+      selectedAgentIds: [],
       isCreating: false,
     };
   },
@@ -32,18 +36,43 @@ export default {
     ...mapGetters({
       agentList: 'agents/getAgents',
     }),
+    selectedAgentNames() {
+      return this.selectedAgentIds.map(
+        id => this.agentList.find(a => a.id === id)?.name ?? ''
+      );
+    },
+    agentMenuItems() {
+      return this.agentList
+        .filter(({ id }) => !this.selectedAgentIds.includes(id))
+        .map(({ id, name, thumbnail, avatar_url }) => ({
+          label: name,
+          value: id,
+          action: 'select',
+          thumbnail: { name, src: thumbnail || avatar_url || '' },
+        }));
+    },
   },
   mounted() {
     this.$store.dispatch('agents/get');
   },
   methods: {
+    handleAgentAdd({ value }) {
+      if (!this.selectedAgentIds.includes(value)) {
+        this.selectedAgentIds.push(value);
+      }
+    },
+    handleAgentRemove(index) {
+      this.selectedAgentIds.splice(index, 1);
+    },
     async addAgents() {
       this.isCreating = true;
       const inboxId = this.$route.params.inbox_id;
-      const selectedAgents = this.selectedAgents.map(x => x.id);
 
       try {
-        await InboxMembersAPI.update({ inboxId, agentList: selectedAgents });
+        await InboxMembersAPI.update({
+          inboxId,
+          agentList: this.selectedAgentIds,
+        });
         router.replace({
           name: 'settings_inbox_finish',
           params: {
@@ -61,44 +90,43 @@ export default {
 </script>
 
 <template>
-  <div
-    class="border border-slate-25 dark:border-slate-800/60 bg-white dark:bg-slate-900 h-full p-6 w-full max-w-full md:w-3/4 md:max-w-[75%] flex-shrink-0 flex-grow-0"
-  >
-    <form class="flex flex-wrap mx-0" @submit.prevent="addAgents()">
+  <div class="h-full w-full p-6 col-span-6">
+    <form class="flex flex-wrap flex-col mx-0" @submit.prevent="addAgents()">
       <div class="w-full">
         <PageHeader
           :header-title="$t('INBOX_MGMT.ADD.AGENTS.TITLE')"
           :header-content="$t('INBOX_MGMT.ADD.AGENTS.DESC')"
         />
       </div>
-      <div class="w-3/5">
-        <div class="w-full">
-          <label :class="{ error: v$.selectedAgents.$error }">
+      <div>
+        <div class="w-full mb-4">
+          <label :class="{ error: v$.selectedAgentIds.$error }">
             {{ $t('INBOX_MGMT.ADD.AGENTS.TITLE') }}
-            <multiselect
-              v-model="selectedAgents"
-              :options="agentList"
-              track-by="id"
-              label="name"
-              multiple
-              :close-on-select="false"
-              :clear-on-select="false"
-              hide-selected
-              selected-label
-              :select-label="$t('FORMS.MULTISELECT.ENTER_TO_SELECT')"
-              :deselect-label="$t('FORMS.MULTISELECT.ENTER_TO_REMOVE')"
-              :placeholder="$t('INBOX_MGMT.ADD.AGENTS.PICK_AGENTS')"
-              @select="v$.selectedAgents.$touch"
-            />
-            <span v-if="v$.selectedAgents.$error" class="message">
+            <div
+              class="rounded-xl outline outline-1 -outline-offset-1 outline-n-weak hover:outline-n-strong px-2 py-2"
+            >
+              <TagInput
+                :model-value="selectedAgentNames"
+                :placeholder="$t('INBOX_MGMT.ADD.AGENTS.PICK_AGENTS')"
+                :menu-items="agentMenuItems"
+                show-dropdown
+                skip-label-dedup
+                @add="handleAgentAdd"
+                @remove="handleAgentRemove"
+              />
+            </div>
+            <span v-if="v$.selectedAgentIds.$error" class="message">
               {{ $t('INBOX_MGMT.ADD.AGENTS.VALIDATION_ERROR') }}
             </span>
           </label>
         </div>
         <div class="w-full">
-          <woot-submit-button
-            :button-text="$t('INBOX_MGMT.AGENTS.BUTTON_TEXT')"
-            :loading="isCreating"
+          <NextButton
+            type="submit"
+            :is-loading="isCreating"
+            solid
+            blue
+            :label="$t('INBOX_MGMT.AGENTS.BUTTON_TEXT')"
           />
         </div>
       </div>

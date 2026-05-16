@@ -57,6 +57,16 @@ describe ConversationFinder do
 
         expect(result[:conversations].map(&:id)).not_to include(restricted_conversation.id)
       end
+
+      it 'returns only the conversations from the inbox if inbox_id filter is passed' do
+        conversation = create(:conversation, account: account, inbox_id: inbox.id)
+        params = { inbox_id: restricted_inbox.id }
+        result = described_class.new(admin, params).perform
+
+        conversation_ids = result[:conversations].map(&:id)
+        expect(conversation_ids).not_to include(conversation.id)
+        expect(conversation_ids).to include(restricted_conversation.id)
+      end
     end
 
     context 'with assignee_type all' do
@@ -177,6 +187,32 @@ describe ConversationFinder do
         create_list(:conversation, 50, account: account, inbox: inbox, assignee: user_1)
         result = conversation_finder.perform
         expect(result[:conversations].length).to be 25
+      end
+    end
+
+    context 'with perform_meta_only' do
+      let(:params) { { assignee_type: 'assigned' } }
+
+      it 'returns only count without conversations' do
+        result = conversation_finder.perform_meta_only
+        expect(result).to have_key(:count)
+        expect(result).not_to have_key(:conversations)
+      end
+
+      it 'returns the correct counts' do
+        result = conversation_finder.perform_meta_only
+        expect(result[:count]).to eq({
+                                       mine_count: 2,
+                                       assigned_count: 3,
+                                       unassigned_count: 1,
+                                       all_count: 4
+                                     })
+      end
+
+      it 'returns same counts as perform' do
+        meta_result = conversation_finder.perform_meta_only
+        full_result = conversation_finder.perform
+        expect(meta_result[:count]).to eq(full_result[:count])
       end
     end
 
