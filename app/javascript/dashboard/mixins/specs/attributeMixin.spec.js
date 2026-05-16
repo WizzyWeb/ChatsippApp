@@ -12,7 +12,7 @@ describe('attributeMixin', () => {
   let store;
 
   beforeEach(() => {
-    actions = { updateUISettings: jest.fn(), toggleSidebarUIState: jest.fn() };
+    actions = { updateUISettings: vi.fn(), toggleSidebarUIState: vi.fn() };
     getters = {
       getSelectedChat: () => ({
         id: 7165,
