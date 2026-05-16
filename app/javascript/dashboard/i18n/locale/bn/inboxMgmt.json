@@ -1124,7 +1124,7 @@
         "AGENT_MESSAGE": "হ্যালো"
       },
       "BRANDING_TEXT": "Chatwoot দ্বারা পরিচালিত",
-      "SCRIPT_SETTINGS": "\n      window.chatwootSettings = {options};"
+      "SCRIPT_SETTINGS": "\n      window.chatshippoSettings = {options};"
     },
     "EMAIL_PROVIDERS": {
       "MICROSOFT": {
